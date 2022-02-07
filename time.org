@@ -1,0 +1,37 @@
+#+TITLE: Time
+
+
+* 3 - given a date (in the past), determine the day of the week (Monday...Sunday) on that day and the number of day(s) that has elapsed since that day until present.
+:PROPERTIES:
+:ID:       e70646b1-ec20-4f2d-95f6-9865382a197b
+:END:
+#+begin_src python :results output
+from datetime import datetime
+def solution(d):
+    now = datetime.now()
+    return ((now - d).days, datetime.strftime(d, "%A"))
+
+print("{0} {1}".format( *solution(datetime(2010,8,9)) ))
+#+end_src
+
+#+RESULTS:
+: 3765 Monday
+
+#+BEGIN_SRC rust :crates '((chrono . 0.4))
+use chrono::prelude::*;
+
+fn solution(d: Date<Utc>) -> (chrono::Duration, String) {
+    (d - Utc::now().date(), d.format("%A").to_string())
+}
+
+fn main() {
+    let dt = Utc.ymd(2010, 8, 9);
+    let (duration, day) = solution(dt);
+    println!("{} {}", duration.num_days().abs(), day);
+}
+#+end_src
+
+#+RESULTS:
+: 3765 Monday
+
+- https://stackoverflow.com/questions/27182808/how-do-i-get-an-absolute-value-in-rust

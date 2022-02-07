@@ -1,0 +1,22 @@
+#+TITLE: String
+
+
+* [#A] 10 - lets defina a 'special word' as a lowercase alphabet followed by two consecutive digits. given a string replace all 'special words' of length 3 with 3 stars
+:PROPERTIES:
+:ID:       f48425df-255d-4819-898f-fa22950592ad
+:END:
+#+begin_src python :results output
+import re
+
+def solution(s):
+    return re.sub(r'(?<![a-z0-9])[a-zA-Z]{1}[0-9]{2}(?![0-9a-z])', '***', s)
+
+print(solution('h111h11 1111 111 11 1 aaaa aaa aa a a1 aa1 aaa1 a111a a11a 11a  a11   we111 w111 11 well wel3 we11 this is a33 some str ing isnt i77 i33 i33 i33 i33 i33i'))
+#+end_src
+
+#+RESULTS:
+: h111h11 1111 111 11 1 aaaa aaa aa a a1 aa1 aaa1 a111a a11a 11a  ***   we111 w111 11 well wel3 we11 this is *** some str ing isnt *** *** *** *** *** i33i
+
+#+begin_src rust
+
+#+end_src

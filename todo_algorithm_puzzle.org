@@ -1,0 +1,14 @@
+:PROPERTIES:
+:ID:       97d1ce5a-a852-40e8-b1dd-1711f55c6494
+:END:
+#+title: todo algorithm puzzle
+
+ range increment
+Given a starting array of all zeroes and a target array of same length, return the minimum number of rangeIncrement operations needed to arrive at the target array.
+For e.g. starting array = [0, 0, 0, 0, 0, 0] and target array = [4, 3, 1, 9, 2, 0]
+
+A rangeIncrement(i, j) increments all elements in the array with index between i and j by 1.
+For e.g. rangeIncrement(0, 4) on starting array [0, 0, 0, 0, 0, 0] would result in an array [1, 1, 1, 1, 1, 0]
+
+The numbers present in target array are all guaranteed to be unique.
+https://leetcode.com/discuss/interview-question/1158477/google-phone-l4

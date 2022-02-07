@@ -1,0 +1,476 @@
+:PROPERTIES:
+:ID:       fc48f797-b737-47b0-baeb-1694b7dbfd8f
+:END:
+#+TITLE: Math
+#+filetags: :project:
+
+* Inbox
+- [[https://en.wikipedia.org/wiki/Mathematical_optimization][Optimization]]
+
+* L[[https://leetcode.com/contest/biweekly-contest-50/problems/queries-on-number-of-points-inside-a-circle/][eetcode 5718. Queries on Number of Points Inside a Circle]]
+#+begin_quote
+count how many points are in the circle
+#+end_quote
+#+begin_src python
+class Solution:
+    def countPoints(
+        self, points: List[List[int]], queries: List[List[int]]
+    ) -> List[int]:
+        result = [0] * len(queries)
+        for i, q in enumerate(queries):
+            for p in points:
+                if ((p[0] - q[0]) ** 2 + (p[1] - q[1]) ** 2) ** 0.5 <= q[2]:
+                    result[i] += 1
+        return result
+
+
+print(
+    Solution().countPoints(
+        [[1, 3], [3, 3], [5, 3], [2, 2]], [[2, 3, 1], [4, 3, 1], [1, 1, 2]]
+    )
+)
+print(
+    Solution().countPoints(
+        [[1, 1], [2, 2], [3, 3], [4, 4], [5, 5]],
+        [[1, 2, 2], [2, 2, 2], [4, 3, 2], [4, 3, 3]],
+    )
+)
+#+end_src
+* Fast Inverse Square Root
+#+begin_src C :exports both
+float Q_rsqrt(float number)
+{
+    long i;
+    float x2, y;
+    const float threehalfs = 1.5;
+
+    x2 = number * 0,5;
+    y = number;
+    i = * ( long * ) &y;
+    i = 0x5f3759df - ( i >> 1 );
+    y = * ( float * ) &i;
+    y = y * ( threehalfs - ( x2 * y * y ) );
+
+    return y;
+}
+
+int main()
+{
+    printf("%d", Q_rsqrt(10));
+    return 0;
+}
+#+end_src
+
+#+RESULTS:
+: 459938024
+
+* Square numbers
+#+BEGIN_SRC latex
+S - infinite set of square integers
+X - 1 <= X <= 10^8
+how many integers in S are less than X
+answer: ceil(sqrt(X-1))
+#+END_SRC
+* Base number conversion
+to convert number 132 in 8base (octal) to 2base (binary):
+1. to decimal: 1*8^2 + 3*8^1 + 2*8^0 = 64+24+2 = 90
+2. to binary: divide by 2 till 0, and read reminders backwards
+              divmod(90,2) ->
+            0 divmod(45,2) ->
+            1 divmod(22,2) ->
+            0 divmod(11,2) ->
+            1 divmod( 5,2) ->
+            1 divmod( 2,2) ->
+            0 divmod( 1,2) ->
+            1 divmod( 0,2) -> 1011010
+#+BEGIN_SRC python :results output
+print(f"{0b1011010:o}")         #
+#+END_SRC
+
+#+RESULTS:
+: 132
+
+* Count number of digits
+#+BEGIN_SRC python :results output
+import math
+a = 1098_09814_81284_09184
+print(math.floor(1 + math.log10(a)))
+# or in base B
+B = 2
+print(math.floor(1 + math.log10(a) / math.log10(B)))
+print(len(f"{a:#b}"[2:]))
+#+END_SRC
+
+#+RESULTS:
+: 19
+: 60
+: 60
+
+* Logarithms, exponential and power
+#+BEGIN_SRC python :results output
+import math
+print("cubic root of 7", 7**(1/3))
+help(math.log)
+print(math.log(20.085536923187666), math.log2(8), math.log10(1000))
+print(math.exp(1), math.e, math.log(math.e))
+print(math.log(10, 4) == (math.log(10) / math.log(4)))
+#+END_SRC
+
+#+RESULTS:
+#+begin_example
+cubic root of 7 1.912931182772389
+Help on built-in function log in module math:
+
+log(...)
+    log(x, [base=math.e])
+    Return the logarithm of x to the given base.
+
+    If the base not specified, returns the natural logarithm (base e) of x.
+
+3.0 3.0 3.0
+2.718281828459045 2.718281828459045 1.0
+True
+#+end_example
+* Hex grids
+there are $$ R^3 - (R - 1)^3 $$ hex cells in hex grid with side len = R
+convert it to the grid of size range(0, 2R-1)
+* Fractions
+#+BEGIN_SRC python :results output
+from fractions import Fraction
+N = 123123123213
+str_fra = ["21 / 7", "13 / 390", "1242 / 9849244"]
+for f in str_fra:
+    frac = Fraction(f.replace(' ',''))
+    print(frac, frac.numerator, frac.denominator)
+#+END_SRC
+
+#+RESULTS:
+: 3 3 1
+: 1/30 1 30
+: 27/214114 27 214114
+
+* Prime numbers
+** Useful info
+Prime numbers in ranges:
+|    range | # of prime numbers |
+|   0..100 |                 25 |
+|  0..1000 |                169 |
+|  0..7919 |               1000 |
+| 0..10000 |               1229 |
+
+Some prime numbers:
+- 104729
+- 1299708
+- 1e9 + 7
+- 2^31 - 1
+- 112272535095293
+
+Testing strategy to check if N is prime numbers (from worst to ~best):
+- is N divisable by divisor [2..N-1]
+- is N divisable by divisor [2..sqrt(N)]
+- is N divisable by divisor [2..sqrt(N)] but only against odd numbers
+- generate list of prime numbers [2..sqrt(N)] and test against it
+
+** Generating list of prime numbers with Sieve of Eratosthenes algorithm
+#+BEGIN_SRC python :results output :async 1
+N = 10000000
+a = [True for i in range(N + 1)]
+a[0] = 0
+a[1] = 0
+prime = []
+for i in range(2, N+1):
+    if a[i]:
+        j = i**2
+        while j < (N+1):
+            a[j] = 0
+            j += i
+        prime.append(i)
+print(prime[-10:])
+#+END_SRC
+
+#+RESULTS:
+: [9999889, 9999901, 9999907, 9999929, 9999931, 9999937, 9999943, 9999971, 9999973, 9999991]
+
+** Prime Factors
+* Greatest Common Divisor & Least Common Multiple
+* Factorial
+* Modular Arithmetic
+* Euclidean Algorithm
+* Combinatorics
+* Fibonacci
+* Binomial
+* Catalan
+* Probability
+* Cycle-finding
+* Game theory
+* Matrix power
+
+* 5 - Sort by multiple criteria - Given the distinct and valid birthdates of n people as triples (DD, MM, YYYY), order them first by ascending birth months (MM), then by ascending birth dates (DD), an finally by age
+#+begin_src python :results output
+from datetime import datetime as dt
+def solution(bds):
+    return sorted(bds, key=lambda bd: (bd.month, bd.day, 2020-bd.year))
+
+print(solution([
+    dt(2011,2,11),
+    dt(1913,2,11),
+    dt(1999,3,3),
+    dt(2020,3,4),
+]))
+#+end_src
+
+#+begin_src rust :crates '((time . 0.2))
+#[allow(unused_imports)]
+use std::cmp::Ordering;
+use time::{date, Date};
+
+fn solution(mut x: Vec<Date>) -> Vec<Date> {
+    // incorrect
+    // x.sort_by_key(|k| (k.month(), k.day(), 2020-k.year()));
+    // correct
+    // x.sort_by(|a, b| match a.month().cmp(&b.month()) {
+    //     Ordering::Equal => match a.day().cmp(&b.day()) {
+    //         Ordering::Equal => (2020 - a.year()).cmp(&(2020 - b.year())),
+    //         other => other,
+    //     },
+    //     other => other,
+    // });
+    // correct
+    x.sort_by(|a, b| {
+        a.month()
+            .cmp(&b.month())
+            .then(a.day().cmp(&b.day()))
+            .then((2020 - a.year()).cmp(&(2020 - b.year())))
+    });
+    x
+}
+
+fn main() {
+    let bds: Vec<Date> = vec![
+        date!(2011 - 2 - 11),
+        date!(1913 - 2 - 11),
+        date!(1999 - 3 - 3),
+        date!(2020 - 3 - 4),
+    ];
+    println!("{:?}", solution(bds));
+}
+#+end_src
+
+#+RESULTS:
+: [Date { year: 2011, ordinal: 42 }, Date { year: 1913, ordinal: 42 }, Date { year: 1999, ordinal: 62 }, Date { year: 2020, ordinal: 64 }]
+
+- https://stackoverflow.com/questions/40369255/reverse-specific-key-when-sorting-with-multiple-keys
+- https://stackoverflow.com/questions/25877285/how-to-disable-unused-code-warnings-in-rust
+- https://stackoverflow.com/questions/58671430/how-to-allow-dead-code-and-unused-imports-for-dev-builds-only
+- https://doc.rust-lang.org/std/vec/struct.Vec.html#method.sort_by
+- https://doc.rust-lang.org/std/cmp/trait.Ord.html
+- https://doc.rust-lang.org/std/primitive.slice.html#method.sort_by
+-
+
+* 4 - unique sorted set - Given n random integers print the distinct (unique) integers in sorted order
+#+begin_src python :results output
+import random
+def solution(n):
+    return sorted(set(n))
+
+print(solution([random.randint(0,7) for i in range(10)]))
+#+end_src
+
+#+RESULTS:
+: [1, 3, 4, 5, 6, 7]
+
+
+#+begin_src rust :crates '((rand . 0.7))
+use rand::Rng;
+use std::collections::HashSet;
+
+fn solution(mut x: Vec<i32>) -> HashSet<i32> {
+    x.into_iter().collect()
+    // or
+    // x.sort();
+    // x.dedup();
+    // x
+}
+
+fn main() {
+    let mut rng = rand::thread_rng();
+    let nums = (0..10).map(|_| rng.gen_range(0, 7)).collect::<Vec<i32>>();
+    println!("{:?}", solution(nums));
+}
+#+end_src
+
+#+RESULTS:
+: {4, 0, 3, 5, 2}
+
+- https://docs.rs/rand/0.7.3/rand/
+- https://rust-lang-nursery.github.io/rust-cookbook/algorithms/randomness.html
+- https://doc.rust-lang.org/rust-by-example/std/hash/hashset.html
+*** [#A] 7 - Generate all possible permutations of {'A', 'B', 'C', ..., 'J'}, the first N=10 letters in the alphabet
+#+begin_src python :results output
+from itertools import permutations as p
+from string import ascii_uppercase as l
+
+def solution(n=10):
+    return [''.join(r) for r in list(p(l[:n]))]
+
+print(solution(5))
+#+end_src
+
+#+RESULTS:
+: ['ABCDE', 'ABCED', 'ABDCE', 'ABDEC', 'ABECD', 'ABEDC', 'ACBDE', 'ACBED', 'ACDBE', 'ACDEB', 'ACEBD', 'ACEDB', 'ADBCE', 'ADBEC', 'ADCBE', 'ADCEB', 'ADEBC', 'ADECB', 'AEBCD', 'AEBDC', 'AECBD', 'AECDB', 'AEDBC', 'AEDCB', 'BACDE', 'BACED', 'BADCE', 'BADEC', 'BAECD', 'BAEDC', 'BCADE', 'BCAED', 'BCDAE', 'BCDEA', 'BCEAD', 'BCEDA', 'BDACE', 'BDAEC', 'BDCAE', 'BDCEA', 'BDEAC', 'BDECA', 'BEACD', 'BEADC', 'BECAD', 'BECDA', 'BEDAC', 'BEDCA', 'CABDE', 'CABED', 'CADBE', 'CADEB', 'CAEBD', 'CAEDB', 'CBADE', 'CBAED', 'CBDAE', 'CBDEA', 'CBEAD', 'CBEDA', 'CDABE', 'CDAEB', 'CDBAE', 'CDBEA', 'CDEAB', 'CDEBA', 'CEABD', 'CEADB', 'CEBAD', 'CEBDA', 'CEDAB', 'CEDBA', 'DABCE', 'DABEC', 'DACBE', 'DACEB', 'DAEBC', 'DAECB', 'DBACE', 'DBAEC', 'DBCAE', 'DBCEA', 'DBEAC', 'DBECA', 'DCABE', 'DCAEB', 'DCBAE', 'DCBEA', 'DCEAB', 'DCEBA', 'DEABC', 'DEACB', 'DEBAC', 'DEBCA', 'DECAB', 'DECBA', 'EABCD', 'EABDC', 'EACBD', 'EACDB', 'EADBC', 'EADCB', 'EBACD', 'EBADC', 'EBCAD', 'EBCDA', 'EBDAC', 'EBDCA', 'ECABD', 'ECADB', 'ECBAD', 'ECBDA', 'ECDAB', 'ECDBA', 'EDABC', 'EDACB', 'EDBAC', 'EDBCA', 'EDCAB', 'EDCBA']
+
+#+begin_src rust :crates '((itertools . 0.9))
+use itertools::Itertools;
+
+// static ASCII: [char; 26] = [
+//     'A', 'B', 'C', 'D', 'E',
+//     'F', 'G', 'H', 'I', 'J',
+//     'K', 'L', 'M', 'N', 'O',
+//     'P', 'Q', 'R', 'S', 'T',
+//     'U', 'V', 'W', 'X', 'Y',
+//     'Z',
+// ];
+
+fn solution(n: usize) -> Vec<String> {
+    let ascii: Vec<char> = "ABCDEFGIJKLMNOPQRSTUVWXYZ".chars().collect();
+    ascii[..n].permutations(2)
+}
+
+fn main() {
+    println!("{:?}", solution(2));
+}
+#+end_src
+
+#+RESULTS:
+: error: Could not compile `cargoA0S2Ow`.
+
+* [#A] 8 - Generate all possible subsets of {1, 2, ..., 20}, the first N = 20 positive integers
+#+begin_src python :results output
+from itertools import combinations, chain
+
+def solution(n=20):
+    return list(chain.from_iterable([combinations(range(1,n+1), a) for a in range(1, n+1)]))
+
+print(solution(6))
+#+end_src
+
+#+RESULTS:
+: [(1,), (2,), (3,), (4,), (5,), (6,), (1, 2), (1, 3), (1, 4), (1, 5), (1, 6), (2, 3), (2, 4), (2, 5), (2, 6), (3, 4), (3, 5), (3, 6), (4, 5), (4, 6), (5, 6), (1, 2, 3), (1, 2, 4), (1, 2, 5), (1, 2, 6), (1, 3, 4), (1, 3, 5), (1, 3, 6), (1, 4, 5), (1, 4, 6), (1, 5, 6), (2, 3, 4), (2, 3, 5), (2, 3, 6), (2, 4, 5), (2, 4, 6), (2, 5, 6), (3, 4, 5), (3, 4, 6), (3, 5, 6), (4, 5, 6), (1, 2, 3, 4), (1, 2, 3, 5), (1, 2, 3, 6), (1, 2, 4, 5), (1, 2, 4, 6), (1, 2, 5, 6), (1, 3, 4, 5), (1, 3, 4, 6), (1, 3, 5, 6), (1, 4, 5, 6), (2, 3, 4, 5), (2, 3, 4, 6), (2, 3, 5, 6), (2, 4, 5, 6), (3, 4, 5, 6), (1, 2, 3, 4, 5), (1, 2, 3, 4, 6), (1, 2, 3, 5, 6), (1, 2, 4, 5, 6), (1, 3, 4, 5, 6), (2, 3, 4, 5, 6), (1, 2, 3, 4, 5, 6)]
+
+*** [#A] 9 - Given a string that represents a base X number, convert it to an equivalent string in base Y, 2 <= X, Y<=30.
+#+begin_src python :results output
+def solution(s, y, x):
+    return f"{s:#}")
+
+print(solution("1234"))
+#+end_src
+
+#+RESULTS:
+
+* [#A] 11 - given integer X that can contain up to 20 digits, output 'Prime' if X is a prime number or "Composite" otherwise
+#+begin_src python :results output
+def solution(n):
+    if n < 3:
+        return 'Prime' if n <= 2 else 'Composite'
+    if n % 2 == 0 or n % 3 == 0:
+        return 'Composite'
+    for i in range(5,round(n**0.5)):
+        if n % i == 0:
+            return 'Composite'
+    return 'Prime'
+
+print(solution(613195))
+#+end_src
+
+#+RESULTS:
+: Composite
+
+* [#A] 12 - Given a valid mathematical expression involving '+', '-', '*', '/', '(', ')' in a single line, evaluate that expression
+#+begin_src python :results output
+def solution(expr):
+    return eval(expr)
+
+print(solution('3 + 1 * 1 - (2 / 2) / 2 * 1 + 2'))
+#+end_src
+
+#+RESULTS:
+: 5.5
+
+#+begin_src rust
+
+#+end_src
+
+* TODO UVa 10911
+#+begin_src python :results output
+def solution(N, coords):
+    dist_AB = lambda a,b: ((a[0]-b[0])**2 + (a[1]-b[1])**2)**0.5
+    comb = []
+    n = N
+    for i in range(n):
+        for a in range(n-1):
+            comb.append((coords[i], coords[a]))
+        n -= 1
+    print(comb)
+    for c in comb:
+        temp = comb
+        for t in temp:
+            if t[0] not in c or t[1] not in c:
+                print(c,t)
+    return
+
+print(solution(4, [(1,1),(8,6),(6,8),(1,3)]))
+#+end_src
+
+#+RESULTS:
+: [((1, 1), (1, 1)), ((1, 1), (8, 6)), ((1, 1), (6, 8)), ((8, 6), (1, 1)), ((8, 6), (8, 6)), ((6, 8), (1, 1))]
+: ((1, 1), (1, 1)) ((8, 6), (8, 6))
+: ((1, 1), (6, 8)) ((8, 6), (8, 6))
+: ((8, 6), (8, 6)) ((1, 1), (1, 1))
+: ((8, 6), (8, 6)) ((1, 1), (6, 8))
+: ((8, 6), (8, 6)) ((6, 8), (1, 1))
+: ((6, 8), (1, 1)) ((8, 6), (8, 6))
+: None
+
+* Pascal triangle
+#+BEGIN_SRC python :results output :async t
+from itertools import tee
+from typing import List
+
+def pairwise(iterable):
+    "s -> (s0,s1), (s1,s2), (s2, s3), ..."
+    a, b = tee(iterable)
+    next(b, None)
+    return zip(a, b)
+
+
+def generate(numRows: int) -> List[List[int]]:
+    if numRows <= 0:
+        return []
+    if numRows == 1:
+        return [[1]]
+    if numRows == 2:
+        return [[1],[1,1]]
+
+    result = [[1],[1,1]]
+
+
+    for r in range(2,numRows):
+        sums = [sum(pair) for pair in pairwise(result[-1])]
+        result.append([1] + sums + [1])
+
+    return result
+
+print(generate(5))
+#+END_SRC
+
+#+RESULTS:
+: [[1], [1, 1], [1, 2, 1], [1, 3, 3, 1], [1, 4, 6, 4, 1]]
+
+* is !25 divisable by 9317
+#+BEGIN_SRC python :results output :async t
+import math
+print(math.factorial(25) % 9317 == 0)
+#+END_SRC
+
+#+RESULTS:
+: False

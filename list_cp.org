@@ -1,0 +1,893 @@
+:PROPERTIES:
+:ID:       bf66f7b9-de76-466c-93d3-a9c4d1cad17f
+:END:
+#+title: list cp
+#+filetags: :project:
+* Leetcode 0021
+#+begin_src python :exports both :outputs both
+# Definition for singly-linked list.
+# class ListNode:
+#     def __init__(self, val=0, next=None):
+#         self.val = val
+#         self.next = next
+
+from bisect import insort_left
+
+
+def iterate_ll(item):
+    while item is not None:
+        yield item
+        item = item.next
+
+
+class Solution:
+    def mergeTwoLists(self, l1: ListNode, l2: ListNode) -> ListNode:
+        r = []
+        for item in iterate_ll(l1):
+            insort_left(r, item)
+
+        for item in iterate_ll(l2):
+            insort_left(r, item)
+
+        return r
+#+end_src
+
+* [[https://leetcode.com/problems/remove-duplicates-from-sorted-array/][Leetcode 26. Remove Duplicates from Sorted Array]]
+#+begin_quote
+Given a sorted array nums, remove the duplicates in-place such that each element appears only once and returns the new length.
+#+end_quote
+
+#+begin_src python :results output :exports both
+class Solution:
+    def removeDuplicates(self, nums: List[int]) -> int:
+        seen = set()
+        for i in range(len(nums)-1, -1, -1):
+            if nums[i] in seen:
+                nums.pop(i)
+            seen.add(nums[i])
+        return len(nums)
+
+print(Solution().removeDuplicates([1,2,2,3,3,5]))
+#+end_src
+
+#+RESULTS:
+: 4
+
+or faster, thanks to making use of the fact the array is sorted
+#+begin_src python :results output :exports both
+class Solution:
+    def removeDuplicates(self, nums: List[int]) -> int:
+        cur = 0
+        for pos in range(1, len(nums)):
+            if nums[pos] != nums[cur]:
+                cur += 1
+                nums[cur] = nums[pos]
+        return cur + 1
+
+print(Solution().removeDuplicates([1,2,2,3,3,5]))
+#+end_src
+
+#+RESULTS:
+: 4
+
+* [[https://leetcode.com/problems/remove-element/][Leetcode 27. Remove Element]]
+#+begin_quote
+Given an array nums and a value val, remove all instances of that value in-place and return the new length.
+#+end_quote
+#+begin_src python :results output :exports both
+class Solution:
+    def removeElement(self, nums: List[int], val: int) -> int:
+        while val in nums:
+            nums.remove(val)
+        return len(nums)
+
+print(Solution().removeElement([1,3,2,5,2,3], 3))
+#+end_src
+
+#+RESULTS:
+: 4
+
+[[id:bf2625f2-703a-4646-9299-e6f8213db340][???]]
+#+begin_src C++
+class Solution {
+public:
+    int removeElement(vector<int>& nums, int val) {
+        std::vector<int>::iterator itr;
+
+		// make sure to #include<algorithm>
+    	itr = remove(nums.begin(), nums.end(), val);
+
+	    nums.resize(std::distance(nums.begin(), itr));
+
+	    return nums.size();
+    }
+};
+#+end_src
+* [[https://leetcode.com/problems/spiral-matrix/][Leetcode 54. Spiral Matrix]]
+#+begin_quote
+Given an m x n matrix, return all elements of the matrix in spiral order.
+#+end_quote
+#+begin_src python :results output :exports both :session
+class Solution:
+    def spiralOrder(self, mat: List[List[int]]) -> List[int]:
+        if len(mat) == 1:
+            return mat[0]
+        x, y = len(mat) - 1, len(mat[0]) - 1
+        r, c = 0, 0
+        nr, nc = 0, 1
+        visited_rows = set()
+        visited_cols = set()
+        result = []
+        for i in range((x + 1) * (y + 1)):
+            result.append(mat[r][c])
+
+            # TR corner
+            if c == y and r == 0:
+                nr = 1
+                nc = 0
+                visited_rows.add(r)
+            # BR corner
+            elif r == x and c == y:
+                nr = 0
+                nc = -1
+                visited_cols.add(c)
+            # LR corner
+            elif c == 0 and r == x:
+                nr = -1
+                nc = 0
+                visited_rows.add(r)
+            elif (nr == 1 and r + 1 in visited_rows) or (
+                nr == -1 and r - 1 in visited_rows
+            ):
+                nr = 0
+                nc = -1 if c + 1 in visited_cols else 1
+                visited_cols.add(c)
+            if (nc == 1 and c + 1 in visited_cols) or (
+                nc == -1 and c - 1 in visited_cols
+            ):
+                nr = -1 if r + 1 in visited_rows else 1
+                nc = 0
+                visited_rows.add(r)
+
+            r += nr
+            c += nc
+
+        return result
+
+
+print(Solution().spiralOrder([[1, 2, 3], [4, 5, 6], [7, 8, 9]]))
+print(Solution().spiralOrder([[1, 2, 3, 4], [5, 6, 7, 8], [9, 10, 11, 12]]))
+print(Solution().spiralOrder([[1, 2], [3, 4], [5, 6], [7, 8]]))
+print(
+    Solution().spiralOrder(
+        [
+            [1, 2, 3, 4, 5],
+            [6, 7, 8, 9, 10],
+            [11, 12, 13, 14, 15],
+            [16, 17, 18, 19, 20],
+            [21, 22, 23, 24, 25],
+        ]
+    )
+)
+print(
+    Solution().spiralOrder(
+        [
+            [1, 2, 3, 4, 5, 6],
+            [7, 8, 9, 10, 11, 12],
+            [13, 14, 15, 16, 17, 18],
+            [19, 20, 21, 22, 23, 24],
+            [25, 26, 27, 28, 29, 30],
+            [31, 32, 33, 34, 35, 36],
+        ]
+    )
+)
+print(Solution().spiralOrder([[2, 3]]))
+#+end_src
+
+#+RESULTS:
+: [1, 2, 3, 6, 9, 8, 7, 4, 5]
+: [1, 2, 3, 4, 8, 12, 11, 10, 9, 5, 6, 7]
+: [1, 2, 4, 6, 8, 7, 5, 3]
+: [1, 2, 3, 4, 5, 10, 15, 20, 25, 24, 23, 22, 21, 16, 11, 6, 7, 8, 9, 14, 19, 18, 17, 12, 13]
+: [1, 2, 3, 4, 5, 6, 12, 18, 24, 30, 36, 35, 34, 33, 32, 31, 25, 19, 13, 7, 8, 9, 10, 11, 17, 23, 29, 28, 27, 26, 20, 14, 15, 16, 22, 21]
+: [2, 3]
+
+beautiful idea from leetcode, around 4x faster
+#+begin_src python
+class Solution:
+    def spiralOrder(self, matrix: List[List[int]]) -> List[int]:
+
+        m, n = len(matrix), len(matrix[0])
+        ans = []
+        xlo, ylo = 0, 0
+        xhi, yhi = m-1, n-1
+
+        while len(ans)<m*n:
+            self.outerSpiral(matrix, xlo, ylo, xhi, yhi, ans)
+            xlo += 1
+            ylo += 1
+            xhi -= 1
+            yhi -= 1
+        return ans
+
+
+    def outerSpiral(self, matrix, xlo, ylo, xhi, yhi, ans):
+
+        for j in range(ylo, yhi+1):
+            ans.append(matrix[xlo][j])
+
+        for i in range(xlo+1, xhi+1):
+            ans.append(matrix[i][yhi])
+
+        if xlo<xhi:
+            for j in range(yhi-1, ylo-1, -1):
+                ans.append(matrix[xhi][j])
+
+        if ylo<yhi:
+            for i in range(xhi-1, xlo, -1):
+                ans.append(matrix[i][ylo])
+#+end_src
+* [[https://leetcode.com/problems/intersection-of-two-arrays/][Leetcode 349. Intersection of Two Arrays]]
+#+begin_quote
+Given two integer arrays nums1 and nums2, return an array of their intersection. Each element in the result must be unique and you may return the result in any order.
+#+end_quote
+
+#+begin_src python :results output :exports both
+class Solution:
+    def intersection(self, nums1: List[int], nums2: List[int]) -> List[int]:
+        return list(set(nums1) & set(nums2))
+#+end_src
+* [[https://leetcode.com/problems/third-maximum-number/][Leetcode 414. Third Maximum Number]]
+#+begin_quote
+Given integer array nums, return the third maximum number in this array. If the third maximum does not exist, return the maximum number.
+#+end_quote
+#+begin_src python :results output :exports both
+class Solution:
+    def thirdMax(self, nums: List[int]) -> int:
+        nums = set(nums)
+        if len(nums) < 3:
+            return max(nums)
+        nums.remove(max(nums))
+        nums.remove(max(nums))
+        return max(nums)
+
+print(Solution().thirdMax([1,3,2,5,2,3]))
+#+end_src
+
+#+RESULTS:
+: 2
+
+or faster
+#+begin_src python :results output :exports both
+class Solution:
+    def thirdMax(self, nums: List[int]) -> int:
+
+        first = None
+        second = None
+        third = None
+
+        for _ in nums:
+
+            if first is None:
+                first = _
+                continue
+
+            if second is None:
+                if _ > first:
+                    first, second = _, first
+                elif _ < first:
+                    second = _
+                continue
+
+            if third is None:
+                if _ > first:
+                    first, second, third = _, first, second
+
+                elif _ > second and _ < first:
+                    second, third = _, second
+
+                elif _ < second:
+                    third = _
+                continue
+
+            if _ > third:
+
+                if _ > first:
+                    first, second, third = _, first, second
+                elif _ > second and _ < first:
+                    first, second, third = first, _, second
+                elif _ > third and _ < second:
+                    first, second, third = first, second, _
+
+        return third if third is not None else first
+
+print(Solution().thirdMax([1,3,2,5,2,3]))
+#+end_src
+
+#+RESULTS:
+: 2
+
+* [[https://leetcode.com/problems/find-all-numbers-disappeared-in-an-array/][Leetcode 448. Find All Numbers Disappeared in an Array]]
+#+begin_quote
+Given an array nums of n integers where nums[i] is in the range [1, n], return an array of all the integers in the range [1, n] that do not appear in nums.
+#+end_quote
+#+begin_src python :results output :exports both
+class Solution:
+    def findDisappearedNumbers(self, nums: List[int]) -> List[int]:
+        s = set(range(1,len(nums)+1))
+        n = set(nums)
+        return s-n
+
+print(Solution().findDisappearedNumbers([1,3,2,5,2,3]))
+#+end_src
+
+#+RESULTS:
+: {4, 6}
+
+* [[https://leetcode.com/problems/diagonal-traverse/][Leetcode 498. Diagonal Traverse]]
+#+begin_quote
+Given an m x n matrix mat, return an array of all the elements of the array in a diagonal order.
+#+end_quote
+
+#+begin_src python :results output :exports both :session
+class Solution:
+    def findDiagonalOrder(self, mat: List[List[int]]) -> List[int]:
+        x,y = len(mat)-1, len(mat[0]) - 1
+        r,c = 0,0
+        ur = True
+        result = []
+        for i in range((x+1)*(y+1)):
+            result.append(mat[r][c])
+
+            # right side shift down
+            if c == y and ur:
+                nr = 1
+                nc = 0
+                ur = not ur
+            # jump to x-axis neighbore
+            elif (r == 0 and ur) or (r == x and not ur):
+                nr = 0
+                nc = 1
+                ur = not ur
+            # left side shift down
+            elif c == 0 and not ur:
+                nr = 1
+                nc = 0
+                ur = not ur
+            else:
+                nr = -1 if ur else 1
+                nc = 1 if ur else -1
+
+            r += nr
+            c += nc
+
+        return result
+
+print(Solution().findDiagonalOrder([[1,2,3],[4,5,6],[7,8,9]]))
+print(Solution().findDiagonalOrder([[1,2,3,4],[5,6,7,8],[9,10,11,12]]))
+print(Solution().findDiagonalOrder([[1,2],[3,4],[5,6],[7,8]]))
+#+end_src
+
+#+RESULTS:
+: [1, 2, 4, 7, 5, 3, 6, 8, 9]
+: [1, 2, 5, 9, 6, 3, 4, 7, 10, 11, 8, 12]
+: [1, 2, 3, 5, 4, 6, 7, 8]
+
+* [[https://leetcode.com/problems/find-pivot-index/][Leetcode 724. Find Pivot Index]]
+#+begin_quote
+Given an array of integers nums, calculate the pivot index of this array.
+#+end_quote
+
+#+begin_src python :results output :exports both :session
+class Solution:
+    def pivotIndex(self, nums: List[int]) -> int:
+        S = sum(nums)
+        left = 0
+        for i,n in enumerate(nums):
+            if left == S - left - n:
+                return i
+            left += n
+        return -1
+
+print(Solution().pivotIndex([1,7,3,6,5,6]))
+print(Solution().pivotIndex([1,5,6]))
+print(Solution().pivotIndex([-1,-1,0,0,1,1,0]))
+#+end_src
+
+#+RESULTS:
+: 3
+: -1
+: 6
+* [[https://leetcode.com/problems/sort-array-by-parity/][Leetcode 905. Sort Array By Parity]]
+#+begin_quote
+Given an array A of non-negative integers, return an array consisting of all the even elements of A, followed by all the odd elements of A. You may return any answer array that satisfies this condition.
+#+end_quote
+using deque, =O(n log n)=
+#+begin_src python :results output :exports both :export both
+from collections import deque
+class Solution:
+    def sortArrayByParity(self, A: List[int]) -> List[int]:
+        r = deque()
+        for a in A:
+            if a % 2 != 0:
+                r.append(a)
+            else:
+                r.appendleft(a)
+        return r
+
+print(Solution().sortArrayByParity([1,3,2,5,2,3]))
+#+end_src
+
+#+RESULTS:
+: deque([2, 2, 1, 3, 5, 3])
+
+or faster,
+#+begin_src C++
+class Solution {
+public:
+    vector<int> sortArrayByParity(vector<int>& A) {
+        int i = 0, j = A.size() - 1;
+
+        while (i < j)
+            if (A[i] % 2 != 0)
+                swap(A[i], A[j--]);
+            else i++;
+
+        return A;
+    }
+};
+#+end_src
+* [[https://leetcode.com/problems/valid-mountain-array/][Leetcode 941. Valid Mountain Array]]
+#+begin_quote
+Given an array of integers arr, return true if and only if it is a valid mountain array.
+#+end_quote
+
+#+begin_src python :results output :exports both
+class Solution:
+    def validMountainArray(self, arr: List[int]) -> bool:
+        l = len(arr)
+        climbing = True
+        was_climbing = False
+        if l < 3:
+            return False
+        for i, a in enumerate(arr):
+            if l - 1 == i:
+                break
+            elif climbing and a < arr[i + 1]:
+                was_climbing = True
+            elif climbing and a > arr[i + 1]:
+                climbing = False
+            elif not climbing and a > arr[i + 1]:
+                pass
+            else:
+                return False
+        return not climbing and was_climbing
+
+print(Solution().validMountainArray([1,3,2,5,2,3]))
+print(Solution().validMountainArray([1,3,7,5,2,1]))
+#+end_src
+
+#+RESULTS:
+: False
+: True
+
+or faster
+#+begin_src python :results output :exports both
+class Solution:
+    def validMountainArray(self, arr: List[int]) -> bool:
+        length = len(arr)
+
+        if length<=1: return False
+
+        if arr[0]>=arr[1]: return False
+
+        top = 0
+        for i in range(length-1):
+            if arr[i]<arr[i+1]:
+                top = i+1
+            else:
+                break
+
+        if top == length-1:
+            return False
+
+        for i in range(top,length-1):
+            if arr[i]<=arr[i+1]:
+                return False
+        return True
+
+print(Solution().validMountainArray([1,3,2,5,2,3]))
+print(Solution().validMountainArray([1,3,7,5,2,1]))
+#+end_src
+
+* [[https://leetcode.com/problems/squares-of-a-sorted-array/][Leetcode 977. Squares of a Sorted Array]]
+#+begin_quote
+Given an integer array nums sorted in non-decreasing order, return an array of the squares of each number sorted in non-decreasing order.
+#+end_quote
+#+begin_src python :results output :exports both
+class Solution:
+    def sortedSquares(self, nums: List[int]) -> List[int]:
+        return sorted([n**2 for n in nums])
+
+print(Solution().sortedSquares([-10,-1,3,12,15,20,32]))
+#+end_src
+
+#+RESULTS:
+: [1, 9, 100, 144, 225, 400, 1024]
+
+* TODO [[https://leetcode.com/problems/height-checker/][Leetcode 1051. Height Checker]]
+#+begin_quote
+Students are asked to stand in non-decreasing order of heights for an annual photo. Return the minimum number of students that must move in order for all students to be standing in non-decreasing order of height.
+#+end_quote
+counting sort?
+* [[https://leetcode.com/problems/duplicate-zeros/][Leetcode 1089. Duplicate zeros]]
+#+begin_quote
+Given a fixed length array arr of integers, duplicate each occurrence of zero, shifting the remaining elements to the right. Note that elements beyond the length of the original array are not written. Do the above modifications to the input array in place, do not return anything from your function.
+#+end_quote
+Following is very trivial way to solve it, however, it's =O(n^2)=, because =.insert()= is =O(n)=
+#+begin_src python :results output :exports both
+class Solution:
+    def duplicateZeros(self, arr: List[int]) -> None:
+        i = 0
+        l = len(arr)
+        while i < l:
+            if arr[i] == 0:
+                arr.insert(i, 0)
+                arr.pop()
+                i += 1
+            i += 1
+        return arr
+
+print(Solution().duplicateZeros([1,3,0,2,0,5,2,3]))
+#+end_src
+
+#+RESULTS:
+: [1, 3, 0, 0, 2, 0, 0, 5]
+
+A better way would be to do it in two passes (=O(2n)=) by counting amount of zeros with =.count()= (=O(n)=), and then iterating backwards
+#+begin_src python :results output :exports both
+class Solution:
+    def replaceElements(self, arr: List[int]) -> List[int]:
+        for i in range(len(arr)-1):
+            m = max(arr[i+1:])
+            arr[i] = m
+        arr[-1] = -1
+        return arr
+
+print(Solution().replaceElements([1,3,2,5,2,3]))
+#+end_src
+
+#+RESULTS:
+: [5, 5, 5, 3, 3, -1]
+
+=O(n)= approach (~40 times faster than naive one), achieved by walking backwards
+ #not_mine
+#+begin_src python :results output :exports both
+class Solution:
+    def replaceElements(self, arr: List[int]) -> List[int]:
+        if len(arr) < 2:
+            return [-1]
+        cb = arr[len(arr)-1]
+        arr[len(arr)-1] = -1
+        for i, x in reversed(list(enumerate(arr[:len(arr)-1]))):
+            if x > cb:
+                arr[i] = cb
+                cb = x
+                continue
+            arr[i] = cb
+        return arr
+
+print(Solution().replaceElements([1,3,2,5,2,3]))
+#+end_src
+
+#+RESULTS:
+: [5, 5, 5, 3, 3, -1]
+
+* [[https://leetcode.com/problems/check-if-n-and-its-double-exist/][Leetcode 1346. Check If N and Its Double Exist]]
+#+begin_quote
+Given an array arr of integers, check if there exists two integers N and M such that N is the double of M ( i.e. N = 2 * M).
+#+end_quote
+
+works, but a lot of computation is done upfront
+#+begin_src python :results output :exports both
+
+print(Solution().checkIfExist([1, 3, 2, 5, 2, 3]))
+#+end_src
+
+better idea would be to do it in on-demand fashion
+#+begin_src python :results output :exports both
+class Solution:
+    def checkIfExist(self, arr: List[int]) -> bool:
+        if not arr:
+            return False
+
+        doubles = set()
+        for i in range(len(arr)):
+            if arr[i]*2 in doubles or arr[i]/2 in doubles:
+                return True
+            doubles.add(arr[i])
+        return False
+
+print(Solution().checkIfExist([1,3,2,5,2,3]))
+#+end_src
+
+#+RESULTS:
+: True
+
+or faster
+#+begin_src python :results output :exports both
+from collections import Counter
+
+
+class Solution:
+    def checkIfExist(self, arr: List[int]) -> bool:
+        s = Counter(arr)
+
+        if s[0] > 1:
+            return True
+
+        for num in arr:
+            if s[2 * num] and num != 0:
+                return True
+
+        return False
+
+print(Solution().checkIfExist([1, 3, 2, 5, 2, 3]))
+#+end_src
+
+#+RESULTS:
+: True
+* [[https://leetcode.com/contest/biweekly-contest-50/problems/minimum-operations-to-make-the-array-increasing/][Leetcode 5717. Minimum Operations to Make the Array Increasing]]
+#+begin_quote
+You are given an integer array nums (0-indexed). In one operation, you can choose an element of the array and increment it by 1. Return the minimum number of operations needed to make nums strictly increasing.
+#+end_quote
+#+begin_src python :results output :exports both :session
+class Solution:
+    def minOperations(self, nums: List[int]) -> int:
+        c = 0
+        for i in range(1, len(nums)):
+            if nums[i - 1] >= nums[i]:
+                diff = nums[i - 1] - nums[i] + 1
+                c += diff
+                nums[i] += diff
+        return c
+
+
+print(Solution().minOperations([1, 1, 1]))
+print(Solution().minOperations([1, 5, 2, 4, 1]))
+print(Solution().minOperations([8]))
+#+end_src
+
+#+RESULTS:
+: 3
+: 14
+: 0
+
+* Competetive Programming 4, 2.2.1.1, Sort by multiple criteria
+#+begin_src python :results output :exports both :async t
+sort_me = [
+    (26, "O", "P"),
+    (27, "N", "O"),
+    (29, "G", "A"),
+    (29, "F", "E"),
+]
+sort_me.sort(key=lambda v: (-v[0], v[1], v[2]))
+
+print(sort_me)
+#+end_src
+
+#+RESULTS:
+: [(29, 'F', 'E'), (29, 'G', 'A'), (27, 'N', 'O'), (26, 'O', 'P')]
+
+* Competetive Programming 4, 2.2.1.3,
+Unsorted array 1<n<100K, of 32bit ints
+** has duplicates?
+** two ints sum to `v`
+*** what if array is sorted?
+** ints which fall in range [a..b]
+** longest consecutive string of ints
+** calc median
+* Competetive Programming 4, 2.2.1.4
+** transpose - switch rows and cols
+#+begin_src python :results output :exports both :async t
+
+#+END_SRC
+** mirror
+*** x-axis
+#+begin_src python :results output :exports both :async t
+
+#+END_SRC
+*** y-axis
+#+begin_src python :results output :exports both :async t
+
+#+END_SRC
+** rotate
+*** clockwise
+#+begin_src python :results output :exports both :async t
+matrix = [
+    [1,2,3,4],
+    [4,5,6,7],
+    [8,9,0,11],
+    [4,7,5,4]
+]
+m = matrix.copy()
+n = len(matrix[0])
+# transpose matrix
+for i in range(n):
+    for j in range(i, n):
+        print((j,i),(i,j), (i,j), (j,i))
+        print(matrix[j][i], matrix[i][j], matrix[i][j], matrix[j][i])
+        matrix[j][i], matrix[i][j] = matrix[i][j], matrix[j][i]
+print([row[::-1] for row in matrix])
+print(list(l[::-1] for l in zip(*m)))
+#+END_SRC
+
+#+RESULTS:
+#+begin_example
+(0, 0) (0, 0) (0, 0) (0, 0)
+1 1 1 1
+(1, 0) (0, 1) (0, 1) (1, 0)
+4 2 2 4
+(2, 0) (0, 2) (0, 2) (2, 0)
+8 3 3 8
+(3, 0) (0, 3) (0, 3) (3, 0)
+4 4 4 4
+(1, 1) (1, 1) (1, 1) (1, 1)
+5 5 5 5
+(2, 1) (1, 2) (1, 2) (2, 1)
+9 6 6 9
+(3, 1) (1, 3) (1, 3) (3, 1)
+7 7 7 7
+(2, 2) (2, 2) (2, 2) (2, 2)
+0 0 0 0
+(3, 2) (2, 3) (2, 3) (3, 2)
+5 11 11 5
+(3, 3) (3, 3) (3, 3) (3, 3)
+4 4 4 4
+[[4, 8, 4, 1], [7, 9, 5, 2], [5, 0, 6, 3], [4, 11, 7, 4]]
+[(4, 3, 2, 1), (7, 6, 5, 4), (11, 0, 9, 8), (4, 5, 7, 4)]
+#+end_example
+*** counterclockwise
+#+begin_src python :results output :exports both :async t
+
+#+END_SRC
+
+* valid sudoku
+#+begin_src python :results output :exports both :async t
+
+
+def isValidSudoku(board: List[List[str]]) -> bool:
+    if len(board) != 9:
+        return False
+
+    for b in [board, list(zip(*board))]:
+        for rc in b:
+            nums = [s for s in rc if s.isnumeric()]
+            if len(rc) != 9:
+                return False
+            if len((set(nums))) != len(nums):
+                return False
+
+    for q in range(0, 9, 3):
+        for i in range(0, 9, 3):
+            nums = (
+                board[q][i : i + 3] + board[q + 1][i : i + 3] + board[q + 2][i : i + 3]
+            )
+            nums = [s for s in nums if s.isnumeric()]
+            if len((set(nums))) != len(nums):
+
+                return False
+
+    return True
+
+
+board = [
+    ["5", "3", ".", ".", "7", ".", ".", ".", "."],
+    ["6", ".", ".", "1", "9", "5", ".", ".", "."],
+    [".", "9", "8", ".", ".", ".", ".", "6", "."],
+    ["8", ".", ".", ".", "6", ".", ".", ".", "3"],
+    ["4", ".", ".", "8", ".", "3", ".", ".", "1"],
+    ["7", ".", ".", ".", "2", ".", ".", ".", "6"],
+    [".", "6", ".", ".", ".", ".", "2", "8", "."],
+    [".", ".", ".", "4", "1", "9", ".", ".", "5"],
+    [".", ".", ".", ".", "8", ".", ".", "7", "9"],
+]
+
+board2 = [
+    ["8", "3", ".", ".", "7", ".", ".", ".", "."],
+    ["6", ".", ".", "1", "9", "5", ".", ".", "."],
+    [".", "9", "8", ".", ".", ".", ".", "6", "."],
+    ["8", ".", ".", ".", "6", ".", ".", ".", "3"],
+    ["4", ".", ".", "8", ".", "3", ".", ".", "1"],
+    ["7", ".", ".", ".", "2", ".", ".", ".", "6"],
+    [".", "6", ".", ".", "2", "8", "."],
+    [".", ".", ".", "4", "1", "9", ".", ".", "5"],
+    [".", ".", ".", ".", "8", ".", ".", "7", "9"],
+]
+
+print(isValidSudoku(board))
+print(isValidSudoku(board2))
+#+END_SRC
+
+#+RESULTS:
+: True
+: False
+
+* Competetive Programming 4, 6 - Binary search -
+#+begin_quote
+Given a list of sorted integers L of size up to 1M items, determine whether a value v exists in L with no more  than 20 comparisons
+#+end_quote
+
+#+begin_src python :results output :exports both
+import random
+import math
+
+
+def solution(L, v):
+    N = NN = len(L)
+    comps = 0
+    sure = False
+    while not sure:
+        idx = int(round(N / 2))
+        if L[idx] > v:
+            L = L[:idx]
+            N = len(L)
+        elif L[idx] < v:
+            L = L[idx:]
+            N = len(L)
+        elif L[idx] == v or len(L) == 1:
+            sure = True
+        comps += 1
+
+        if comps > math.log2(NN) + 1:
+            print("wtf")
+            break
+
+    return comps < 21, v, comps
+
+
+L = [i for i in range(1_000_000)]
+v = random.randrange(0, 1_000_000)
+print(solution(L, v))
+#+end_src
+
+#+RESULTS:
+: (True, 356535, 19)
+
+#+begin_src rust
+fn solution(L: Vec<i32>, v: i32) -> Option<i32> {
+    let mut low: i32 = 0;
+    let mut high: i32 = L.len() as i32 - 1;
+
+    while low <= high {
+        let mid = ((high - low) / 2) + low;
+        let mid_idx = mid as usize;
+        let val = L[mid_idx as usize];
+
+        if val == v {
+            return Some(mid);
+        }
+
+        if val > v {
+            high = mid + 1;
+        }
+
+        if val < v {
+            low = mid - 1;
+        }
+    }
+    None
+    //for a in L {
+
+    //}
+}
+
+fn main() {
+    let L: Vec<i32> = (0i32..1_000_000).collect();
+    println!("{:?}", solution(L, 13000));
+    let i: [usize; 30] = (0..30).collect::<[usize; 30]>();
+}
+#+end_src
+
+#+RESULTS:
+: error: Could not compile `cargomEzPY2`.

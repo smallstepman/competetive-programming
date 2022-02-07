@@ -1,0 +1,1498 @@
+:PROPERTIES:
+:ID:       9781c339-1729-43eb-97b4-e2ff2bbe44a2
+:END:
+#+title: rust cp
+* COMMENT competitive programming
+** kattis - thelastproblem
+#+begin_src rust
+fn solution(s: &str) -> String {
+    format!("Thank you, {}, and farewell!", s)
+}
+
+fn main() {
+    let v = "Cinderilla";
+    println!("{}", solution(v));
+}
+#+end_src
+
+#+RESULTS:
+: Thank you, Cinderilla, and farewell!
+
+** kattis - filip
+#+begin_src rust
+fn solution(s: &str) -> u32 {
+    s.split_whitespace()
+     .map(|s| s.chars()
+               .rev()
+               .collect::<String>()
+               .parse::<u32>()
+               .unwrap())
+     .max()
+     .unwrap()
+}
+
+fn main() {
+    let v = "115 123";
+    println!("{}", solution(v));
+}
+#+end_src
+
+#+RESULTS:
+: 511
+** kattis - onechicken
+#+begin_src rust :crates '((itertools . "0.10.3"))
+use itertools::Itertools;
+
+fn solution(s: &str) -> String {
+    let (x, y) = s.splitn(2, " ").collect_tuple().unwrap();
+    match x > y {
+        true => format!("Dr. Chaz will have {} pieces of chicken left over!", x - y),
+        false => format!("aDr. Chaz needs {} more pieces of chicken!", y - x)
+    }
+}
+// fn solution(s: &str) -> string {
+//     let v = s.split_whitespace()
+//              .map(|s| s.parse::<u32>().unwrap())
+//              .collect::<vec<u32>>();
+//     match v[0] > v[1] {
+//         true => format!("dr. chaz will have {} pieces of chicken left over!", v[0] - v[1]),
+//         false => format!("dr. chaz needs {} more pieces of chicken!", v[1] - v[0])
+//     }
+// }
+
+fn main() {
+    let v = "20 100";
+    println!("{}", solution(v));
+    let v = "2 3";
+    println!("{}", solution(v));
+    let v = "10 1";
+    println!("{}", solution(v));
+}
+#+end_src
+
+#+RESULTS:
+: error: Could not compile `cargoMo2cxE`.
+
+** kattis - lineup
+#+BEGIN_SRC rust :toolchain 'nightly
+#![feature(is_sorted)]
+
+fn solution(s: Vec<&str>) -> String {
+    if s[1..].is_sorted() {
+        "ASCENDING".to_string()
+    } else if s[1..].is_sorted_by(|a, b| b.partial_cmp(a)) {
+        "DESCENDING".to_string()
+    } else {
+        "NEITHER".to_string()
+    }
+}
+
+fn main() {
+    let in1 = vec![
+        "5",
+        "JOE",
+        "BOB",
+        "ANDY",
+        "AL",
+        "ADAM",
+    ];
+    let in2 = vec![
+        "11",
+        "HOPE",
+        "ALI",
+        "BECKY",
+        "JULIE",
+        "MEGHAN",
+        "LAUREN",
+        "MORGAN",
+        "CARLI",
+        "MEGAN",
+        "ALEX",
+        "TOBIN",
+    ];
+    let in3 = vec![
+        "4",
+        "GEORGE",
+        "JOHN",
+        "PAUL",
+        "RINGO",
+    ];
+    println!("{:?}", solution(in1));
+    println!("{:?}", solution(in2));
+    println!("{:?}", solution(in3));
+}
+#+END_SRC
+
+#+RESULTS:
+: "DESCENDING"
+: "NEITHER"
+: "ASCENDING"
+** kattis - pokerhand
+#+begin_src rust
+use std::collections::HashMap;
+use std::hash::Hash;
+
+fn solution(s: String) -> u8 {
+    let ranks = s.split_whitespace()
+                 .map(|x| x.chars().nth(0).unwrap())
+                 .collect::<Vec<char>>();
+    let count_rank = counter(ranks.iter());
+    let max_rank = count_rank.iter()
+                             .max_by_key(|a| a.1)
+                             .map(|(_,v)| v)
+                             .unwrap();
+    *max_rank
+}
+
+
+fn counter<K: Eq + Hash, I: Iterator<Item=K>>(iterable: I) -> HashMap<K, u8> {
+    let mut map = HashMap::new();
+    for element in iterable {
+        *map.entry(element).or_insert(0) += 1;
+    }
+    map
+}
+
+fn main() {
+    let in1 = "AC AD AH AS KD".to_string();
+    let in2 = "2C 4D 4H 2D 2H".to_string();
+    let in3 = "AH 2H 3H 4H 5H".to_string();
+    let out1 = 4;
+    let out2 = 3;
+    let out3 = 1;
+    assert_eq!(solution(in1), out1);
+    assert_eq!(solution(in2), out2);
+    assert_eq!(solution(in3), out3);
+    println!("{:?}", solution("AC AD AH AS KD".to_string()));
+}
+#+end_src
+
+#+RESULTS:
+: 4
+** kattis - sevenwonders
+#+begin_src rust
+use std::collections::HashMap;
+use std::hash::Hash;
+
+fn counter<K: Eq + Hash, I: Iterator<Item=K>>(iterable: I) -> HashMap<K, u32> {
+    let mut map = HashMap::new();
+    for e in iterable {
+        ,*map.entry(e).or_insert(0) += 1;
+    }
+    map
+}
+
+fn solution(s: String) -> u32 {
+    let mut score = 0;
+    let cards = s.chars();
+    let count = counter(cards);
+    for (_k,v) in &count {
+        score += v.pow(2);
+    }
+    if &count.len() == &3 {
+        let mul = count.iter()
+                       .min_by_key(|a| a.1)
+                       .map(|(_,v)| v)
+                       .unwrap();
+        score += 7 * mul;
+    }
+    score
+}
+
+fn main() {
+    println!("{:?}", solution("TCGTTC".to_string()));
+    let in1 = "TCGTTC".to_string();
+    let in2 = "CCC".to_string();
+    let in3 = "TTCCGG".to_string();
+    let out1 = 21;
+    let out2 = 9;
+    let out3 = 26;
+    assert_eq!(solution(in1), out1);
+    assert_eq!(solution(in2), out2);
+    assert_eq!(solution(in3), out3);
+}
+#+end_src
+
+#+RESULTS:
+: 21
+** kattis - vote
+#+begin_src rust
+fn solution(mut s: Vec<usize>) -> Vec<String> {
+    (0..s[0]).map(|i| {
+        let voting_session = s.drain(i+2..i+2+s[1+i]).collect::<Vec<usize>>();
+        let (winner_idx, winner_score) = &voting_session.iter().enumerate().max_by_key(|x| x.1).unwrap();
+        if voting_session.iter().filter(|x| x == winner_score).count() > 1 {
+            format!("no winner")
+        } else if *winner_score > &(voting_session.iter().sum::<usize>() - *winner_score)  {
+            format!("majority winner {}", winner_idx + 1)
+        } else {
+            format!("minority winner {}", winner_idx + 1)
+        }
+    }).collect::<Vec<String>>()
+}
+
+fn main() {
+    let i = vec![
+        5,
+        3,
+        10,
+        21,
+        10,
+        3,
+        20,
+        10,
+        10,
+        3,
+        20,
+        20,
+        10,
+        3,
+        10,
+        10,
+        10,
+        4,
+        15,
+        15,
+        15,
+        45,
+    ];
+    let o = vec![
+        "majority winner 2",
+        "minority winner 1",
+        "no winner",
+        "no winner",
+        "minority winner 4",
+    ];
+    assert_eq!(solution(i), o);
+}
+#+end_src
+
+#+RESULTS:
+
+** kattis - artichoke
+#+begin_src rust :crates
+fn formula(p: u32, a: u32, b: u32, c: u32, d: u32, k: u32) -> f64 {
+    (p as f64) * (((a*k+b) as f64).sin()+((c*k+d) as f64).cos()+2.0)
+}
+
+trait PreciseRound<T> {
+    fn round_with_precision(self, p: u8) -> T;
+}
+
+impl PreciseRound<f64> for f64 {
+    fn round_with_precision(self, p: u8) -> f64 {
+        let precision = 10_f64.powf(p as f64);
+        (self * precision).round() / precision
+    }
+}
+
+fn solution(s: String) -> f64 {
+    let vars: Vec<u32> = s.split_whitespace()
+                          .map(|s| s.parse().unwrap())
+                          .collect();
+    let (mut diff, mut vmax): (f64, f64) = (0., f64::MIN);
+    if let [p,a,b,c,d,n] = vars[0..6] {
+        let prices: Vec<f64> = (1..(n as u32)+1).map(|k| formula(p,a,b,c,d,k.into())).collect();
+        for p in prices {
+            // https://math.stackexchange.com/questions/1172115
+            (diff, vmax) = (diff.max(vmax - p), vmax.max(p));
+        }
+    }
+    diff.round_with_precision(6)
+}
+fn main() {
+    let i1 = "42 1 23 4 8 10".to_string();
+    let i2 = "100 7 615 998 801 3".to_string();
+    let i3 = "100 432 406 867 60 1000".to_string();
+    let o1 = 104.85511;
+    let o2 = 0.00;
+    let o3 = 399.303813;
+    assert_eq!(solution(i1), o1);
+    assert_eq!(solution(i2), o2);
+    assert_eq!(solution(i3), o3);
+}
+#+end_src
+
+#+RESULTS:
+
+** kattis - basicprogramming1
+*** 1
+#+begin_src rust :tangle ~/Desktop/trash/basicprogramming1.rs
+#![allow(unused_variables, dead_code)]
+
+trait Solver {
+    fn solve(&self, input: &Input) -> String;
+}
+
+#[derive(Clone)]
+struct Input {
+    n: u32,
+    t: u32,
+    a: Vec<u32>
+}
+
+impl Input {
+    fn parse(s: String) -> Self {
+        let dawaj = s.split_whitespace()
+                           .map(|s| s.chars()
+                                .collect::<String>()
+                                .parse::<u32>()
+                                .unwrap()).collect::<Vec<u32>>();
+
+
+        match dawaj.as_slice() {
+            [n, t, array @ ..] => Input {
+                n: *n,
+                t: *t,
+                a: array.to_vec()
+            },
+            _ => panic!()
+        }
+    }
+    fn select_solver(&self) -> impl Solver {
+        match self.t {
+            1 => {return <Option1 as Solver>::solve;},
+            2 => {return <Option2 as Solver>::solve;},
+            _ => panic!()
+            // 3 => Option3,
+            // 4 => Option4,
+            // 5 => Option5,
+            // 6 => Option6,
+            // 7 => Option7,
+        }
+    }
+}
+
+struct Option1;
+struct Option2;
+struct Option3;
+struct Option4;
+struct Option5;
+struct Option6;
+struct Option7;
+impl Solver for Option1 {
+    fn solve(&self, input: &Input) -> String {
+        "s".to_string()
+    }
+}
+impl Solver for Option2 {
+    fn solve(&self, input: &Input) -> String {
+        "s".to_string()
+    }
+}
+impl Solver for Option3 {
+    fn solve(&self, input: &Input) -> String {
+        "s".to_string()
+    }
+}
+impl Solver for Option4 {
+    fn solve(&self, input: &Input) -> String {
+        "s".to_string()
+    }
+}
+impl Solver for Option5 {
+    fn solve(&self, input: &Input) -> String {
+        "s".to_string()
+    }
+}
+impl Solver for Option6 {
+    fn solve(&self, input: &Input) -> String {
+        "s".to_string()
+    }
+}
+impl Solver for Option7 {
+    fn solve(&self, input: &Input) -> String {
+        "s".to_string()
+    }
+}
+
+fn solution(s: &str) -> String {
+    let parsed: Input = Input::parse(s.to_string());
+    let s = &parsed.select_solver();
+    s.solve(&parsed.clone());
+    "s".to_string()
+}
+
+fn main() {
+    let input = "7 1 1 2 3 4 5 6 7";
+    // let output = "7";
+    println!("{}", solution(input));
+    // let input = "7 2 1 2 3 4 5 6 7";
+    // let output = "Smaller";
+    // let input = "7 3 1 2 3 4 5 6 7";
+    // let output = "2";
+    // let input = "7 4 1 2 3 4 5 6 7";
+    // let output = "28";
+    // let input = "7 5 1 2 3 4 5 6 7";
+    // let output = "12";
+    // let input = "10 6 7 4 11 37 14 22 40 17 11 3";
+    // let output = "helloworld";
+    // let input = "3 7 1 0 2";
+    // let output = "Cyclic";
+}
+#+end_src
+
+#+RESULTS:
+: error: Could not compile `cargo9An818`.
+
+*** 2
+#+begin_src rust :tangle ~/Desktop/trash/basicprogramming1.rs
+#![allow(unused_variables, dead_code)]
+
+trait Parser {
+    fn parse(s: String) -> Self;
+}
+
+#[derive(Clone)]
+struct Input {
+    n: u32,
+    t: u32,
+    a: Vec<u32>
+}
+
+impl Parser for Input {
+    fn parse(s: String) -> Self {
+        match s.split_whitespace()
+                           .map(|s| s.chars()
+                                .collect::<String>()
+                                .parse::<u32>()
+                                .unwrap()).collect::<Vec<u32>>().as_slice() {
+            [n, t, array @ ..] => Self {
+                n: *n,
+                t: *t,
+                a: array.to_vec()
+            },
+            _ => panic!()
+        }
+    }
+}
+
+struct Solver;
+impl Solver {
+    fn solve(i: Input) -> String {
+        match i.t {
+            1 => Self::case1(i.a),
+            2 => Self::case2(i.a),
+            3 => Self::case3(i.a),
+            4 => Self::case4(i.a),
+            5 => Self::case5(i.a),
+            6 => Self::case6(i.a),
+            7 => Self::case7(i.a),
+            _ => panic!()
+        }
+    }
+    fn case1(a: Vec<u32>) -> String { "7".to_string() }
+    fn case2(a: Vec<u32>) -> String {
+        if let [x,y,..] = a.as_slice() {
+            if x > y {
+                "Bigger"
+            } else if x == y {
+                "Equal"
+            } else {
+                "Smaller"
+            }
+        } else {
+            ""
+        }.to_string()
+    }
+    fn case3(a: Vec<u32>) -> String {
+        if let [x,y,z,..] = a.as_slice() {
+            let mut v = [x,y,z].to_vec();
+            v.sort();
+            return v[1].to_string()
+        } else {
+            return "err".to_string()
+        }
+    }
+    fn case4(a: Vec<u32>) -> String { format!("{}", a.iter().sum::<u32>()) }
+    fn case5(a: Vec<u32>) -> String { format!("{}", a.iter().filter(|&x| x % 2 == 0).sum::<u32>()) }
+    fn case6(a: Vec<u32>) -> String {
+        format!("{}", a.iter()
+                       .map(|&x| ('a'..='z').nth((x % 26) as usize).unwrap())
+                       .collect::<String>()) }
+    fn case7(a: Vec<u32>) -> String {
+        let mut i = 0;
+        let r = loop {
+            if let Some(v) = a.get(i) {
+                if *v == a.len() as u32 - 1 {
+                    return "Done".to_string();
+                } else if a[*v as usize] == i.try_into().unwrap() {
+                    return "Cyclic".to_string();
+                } else {
+                    i = *v as usize;
+                }
+            } else {
+                return "Out".to_string();
+            }
+        };
+    }
+}
+
+fn solution(s: &str) -> String {
+    let parsed = Input::parse(s.to_string());
+    Solver::solve(parsed)
+}
+
+fn main() {
+    let input = "7 1 1 2 3 4 5 6 7";
+    let output = "7";
+    println!("{} == {}", solution(input), output);
+    let input = "7 2 1 2 3 4 5 6 7";
+    let output = "Smaller";
+    println!("{} == {}", solution(input), output);
+    let input = "7 3 1 2 3 4 5 6 7";
+    let output = "2";
+    println!("{} == {}", solution(input), output);
+    let input = "7 4 1 2 3 4 5 6 7";
+    let output = "28";
+    println!("{} == {}", solution(input), output);
+    let input = "7 5 1 2 3 4 5 6 7";
+    let output = "12";
+    println!("{} == {}", solution(input), output);
+    let input = "10 6 7 4 11 37 14 22 40 17 11 3";
+    let output = "helloworld";
+    println!("{} == {}", solution(input), output);
+    let input = "3 7 1 0 2";
+    let output = "Cyclic";
+    println!("{} == {}", solution(input), output);
+}
+#+end_src
+
+#+RESULTS:
+: 7 == 7
+: Smaller == Smaller
+: 2 == 2
+: 28 == 28
+: 12 == 12
+: helloworld == helloworld
+: Cyclic == Cyclic
+
+** kattis - treasurehunt
+#+begin_src rust
+#![allow(unused_variables,dead_code)]
+
+#[derive(Debug)]
+struct Mover {
+    x: usize,
+    y: usize,
+    count: u32,
+    xb: usize,
+    yb: usize
+}
+
+impl Mover {
+    fn new(bounds: (usize, usize)) -> Self {
+        Mover {
+            x: 0,
+            y: 0,
+            count: 0,
+            xb: bounds.0,
+            yb: bounds.1
+        }
+    }
+    fn travel(&self, direction: char) -> Option<Self> {
+        let move_by: (isize, isize) = match direction {
+            'E' if self.x + 1 != self.xb => (1, 0),
+            'W' if self.x != 0           => (-1,0),
+            'N' if self.y != 0           => (0, -1),
+            'S' if self.y + 1 != self.yb => (0, 1),
+            'E' | 'W' | 'N' | 'S'        => return None,
+            _ => panic!()
+        };
+        Some(Mover {
+            x: (move_by.0 + (self.x as isize)) as usize,
+            y: (move_by.1 + (self.y as isize)) as usize,
+            count: 1 + self.count,
+            ..*self
+        })
+    }
+}
+
+fn solution (s: &str) -> String {
+    let mut visited: Vec<(usize,usize)> = vec![];
+    if let [r, c, rows @ ..] = s.split_whitespace()
+                                .into_iter()
+                                .collect::<Vec<&str>>()
+                                .as_slice() {
+        let r: usize = r.parse().unwrap();
+        let c: usize = c.parse().unwrap();
+        let mut m = Mover::new((r,c));
+
+        loop {
+            if let Some(r) = rows.get(m.y) {
+                if let Some(c) = r.chars().nth(m.x) {
+                    if c == 'T' {
+                        return format!("{}", m.count);
+                    } else {
+                        visited.push((m.x,m.y));
+                        if let Some(x) = m.travel(c) {
+                            m = x;
+                        } else if visited.contains(&(m.x,m.y)) {
+                            return "Lost".to_string();
+                        } else {
+                            return "Out".to_string();
+                        }
+                    }
+                } else {
+                    return "Out".to_string() ;
+                }
+            } else {
+                return "Out".to_string();
+            }
+        }
+    }
+    return "Out".to_string();
+}
+
+fn main() {
+    let i = "
+    2 2
+    ES
+    TW";
+    let o = 3;
+    println!("{} == {}", solution(i), o);
+}
+#+end_src
+
+#+RESULTS:
+: 3 == 3
+** kattis - trainpassengers
+#+begin_src rust
+#![allow(unused_must_use, unused_variables, unused_comparisons)]
+
+#[derive(Copy, Clone, Debug)]
+struct Train {
+    capacity: u32,
+    passengers: u32,
+}
+
+struct Parser;
+
+impl Parser {
+    fn parse_input(s: &str) -> (u32, u32, Vec<Vec<u32>>, u32) {
+        let v = s.lines()
+                 .nth(0)
+                 .unwrap()
+                 .split_whitespace()
+                 .into_iter()
+                 .map(|c| c.parse::<u32>().unwrap())
+                 .collect::<Vec<u32>>();
+        let rows = Parser::parse_rows(s);
+        let last = rows.last().unwrap().last().unwrap().clone();
+        let r = (v[0], v[1], rows, last);
+        // dbg!(&r);
+        r
+    }
+    fn parse_rows(s: &str) -> Vec<Vec<u32>> {
+        let x = s.lines().collect::<Vec<&str>>();
+        let x = &x.as_slice()[1..];
+        let x: Vec<_> = x.iter()
+                         .map(|s| s.split_whitespace()
+                                   .into_iter()
+                                   .map(|w| w.parse::<u32>().unwrap()).collect::<Vec<_>>())
+                         .collect();
+        x
+    }
+}
+
+impl Train {
+    fn new(capacity: u32, passengers: u32) -> Self {
+        Train { capacity, passengers }
+    }
+
+    fn stop_at_the_station(&mut self, left: u32, entered: u32, stayed: u32) -> Option<bool> {
+        // dbg!(&self, left, entered, stayed);
+        self.calculate_passengers_onboard(left, entered)
+            .and_then(|p| self.check_capacity_coretness(p, stayed))
+            .and_then(|p| self.update_passengers_count(p))
+    }
+
+    fn calculate_passengers_onboard(&self, left: u32, entered: u32) -> Option<u32> {
+        Some(self)
+            .and_then(|t| t.passengers.checked_sub(left))
+            .and_then(|c| c.checked_add(entered))
+    }
+
+    fn update_passengers_count(&mut self, p: u32) -> Option<bool> {
+        self.passengers = p;
+        Some(true)
+    }
+
+    fn check_capacity_coretness(&self, p: u32, stayed: u32) -> Option<u32> {
+        if p <= self.capacity && stayed >= 0 && self.capacity >= self.passengers {
+            return Some(p);
+        }
+        None
+    }
+    fn is_empty(&self) -> bool {
+        self.passengers == 0
+    }
+}
+
+fn solution(s: &str) -> &str {
+    let (c, n, rows, last_stayed) = Parser::parse_input(s);
+    if last_stayed > 0 { return "impossible"; }
+    let mut t = Train::new(c, 0);
+    for row in rows {
+        if let [left, entered, stayed] = row.as_slice() {
+            if t.stop_at_the_station(*left, *entered, *stayed).is_none() {
+                // dbg!(&t);
+                return "impossible";
+            }
+        }
+    }
+    if t.is_empty() {
+        "possible"
+    } else {
+        "impossible"
+    }
+}
+
+fn main() {
+
+    let i = "1 2
+    0 1 1
+    1 0 0";
+    let o = "possible";
+    println!("{} == {}", solution(i), o);
+    let i = "1 2
+    1 0 0
+    0 1 0";
+    let o = "impossible";
+    println!("{} == {}", solution(i), o);
+    let i = "1 2
+    0 1 0
+    1 0 1";
+    let o = "impossible";
+    println!("{} == {}", solution(i), o);
+    let i = "1 2
+    0 1 1
+    0 0 0";
+    let o = "impossible";
+    println!("{} == {}", solution(i), o);
+}
+#+end_src
+
+#+RESULTS:
+#+begin_example
+[src/main.rs:24] &r = (
+    1,
+    2,
+    [
+        [
+            0,
+            1,
+            1,
+        ],
+        [
+            1,
+            0,
+            0,
+        ],
+    ],
+    0,
+)
+possible == possible
+[src/main.rs:24] &r = (
+    1,
+    2,
+    [
+        [
+            1,
+            0,
+            0,
+        ],
+        [
+            0,
+            1,
+            0,
+        ],
+    ],
+    0,
+)
+impossible == impossible
+[src/main.rs:24] &r = (
+    1,
+    2,
+    [
+        [
+            0,
+            1,
+            0,
+        ],
+        [
+            1,
+            0,
+            1,
+        ],
+    ],
+    1,
+)
+impossible == impossible
+[src/main.rs:24] &r = (
+    1,
+    2,
+    [
+        [
+            0,
+            1,
+            1,
+        ],
+        [
+            0,
+            0,
+            0,
+        ],
+    ],
+    0,
+)
+impossible == impossible
+#+end_example
+
+** kattis - friday
+- every year starts on a Sunday
+#+begin_src rust
+fn solution(i: &str) -> String {
+    i.lines()
+        .skip(2)
+        .step_by(2)
+        .map(|year| {
+            year.split_whitespace()
+                .map(|v| v.parse().unwrap())
+                .collect()
+        })
+        .map(|months: Vec<u32>| {
+            let mut month_starts_at = 0;
+            let mut happy_days_count = 0;
+            for days_in_month in months {
+                if month_starts_at == 0 && days_in_month >= 13 {
+                    happy_days_count += 1;
+                }
+                month_starts_at = days_in_month % 7;
+            }
+            happy_days_count.to_string()
+        })
+        .collect::<Vec<_>>()
+        .join("\n")
+}
+
+fn main() {
+    let i = "3
+20 1
+20
+40 2
+21 19
+365 12
+31 28 31 30 31 30 31 31 30 31 30 31";
+    let o = "1
+2
+2";
+    assert_eq!(solution(i), o);
+}
+#+end_src
+** kattis - skener
+#+begin_src rust
+fn solution(i: &str) -> String {
+    if let [_, _, zr, zc, data @ ..] = i.split_whitespace().collect::<Vec<&str>>().as_slice() {
+        let zr: usize = zr.parse().unwrap();
+        let zc: usize = zc.parse().unwrap();
+        let mut out: Vec<String> = vec![];
+        for d in data {
+            let mut r = String::new();
+            for c in d.chars() {
+                r.push_str(std::iter::repeat(c).take(zc).collect::<String>().as_str());
+            }
+            for _ in 0..zr {
+                out.push(r.clone());
+            }
+        }
+        return out.join("\n");
+    }
+    "".to_string()
+}
+
+fn main() {
+    let i = "3 3 1 2
+.x.
+x.x
+.x.";
+    let o = "..xx..
+xx..xx
+..xx..
+";
+    println!("{} == {}", solution(i), o);
+    let i = "3 3 2 1
+.x.
+x.x
+.x.";
+    let o = ".x.
+.x.
+x.x
+x.x
+.x.
+.x.
+";
+    println!("{} == {}", solution(i), o);
+}
+#+end_src
+** kattis - chopin
+#+begin_src rust
+use std::collections::HashMap;
+
+fn find_value(v: &str, d: &HashMap<&str, &str>) -> Option<String> {
+    if let Some((a, b)) = std::iter::zip(d.values(), d.keys()).find(|(x, y)| *x == &v || *y == &v) {
+        if &v == a {
+            Some(b.to_string())
+        } else {
+            Some(a.to_string())
+        }
+    } else {
+        None
+    }
+}
+
+fn solution(i: &str) -> String {
+    let mut d = HashMap::new();
+    d.insert("A#", "Bb");
+    d.insert("C#", "Db");
+    d.insert("D#", "Eb");
+    d.insert("F#", "Gb");
+    d.insert("G#", "Ab");
+    i.lines()
+        .enumerate()
+        .map(|(mut idx, line)| {
+            idx += 1;
+            let input = line.split_whitespace().collect::<Vec<&str>>();
+            let (note, tonality) = (input[0], input[1]);
+            if let Some(note) = find_value(note, &d) {
+                format!("Case {}: {} {}", idx, note, tonality)
+            } else {
+                format!("Case {}: UNIQUE", idx)
+            }
+        })
+        .collect::<Vec<String>>()
+        .join("\n")
+}
+
+fn main() {
+    let i = "Ab minor
+D# major
+G minor";
+    let o = "Case 1: G# minor
+Case 2: Eb major
+Case 3: UNIQUE";
+    println!("{} == {}", solution(i), o);
+}
+#+end_src
+** kattis - memory match
+#+begin_src rust
+use std::collections::{HashMap, HashSet};
+
+fn solution(i: &str) -> String {
+    let mut map: HashMap<&str, HashSet<u8>> = HashMap::new();
+    let cards = i.lines().nth(0).unwrap().parse::<u8>().unwrap();
+    i.lines()
+        .skip(2)
+        .map(|l| {
+            let v = l.split_whitespace().collect::<Vec<&str>>();
+            let (c1, p1): (u8, &str) = (v[0].parse().unwrap(), v[2]);
+            let (c2, p2): (u8, &str) = (v[1].parse().unwrap(), v[3]);
+            map.entry(p1).or_default().insert(c1);
+            map.entry(p2).or_default().insert(c2);
+            if p1 == p2 {
+                map.entry(p2).or_default().insert(0);
+            }
+        })
+        .for_each(drop);
+    // dbg!(&map);
+    let x = map.values().filter(|v| v.len() == 3).count();
+    if map.keys().len() == (cards / 2) as usize {
+        return (cards as u8 / 2 - x as u8).to_string();
+    } else {
+        return map.values().filter(|v| v.len() == 2).count().to_string();
+    }
+}
+
+fn main() {
+    let i = "8
+    5
+    1 3 earth sun
+    2 6 mars sun
+    6 3 sun sun
+    7 5 earth moon
+    2 7 mars earth";
+    let o = "3";
+    println!("{} == {}", solution(i), o);
+
+    let i = "10
+    6
+    1 2 moon earth
+    9 10 venus sun
+    8 7 moon venus
+    1 8 moon moon
+    4 10 sun sun
+    9 6 venus mars";
+    let o = "3";
+    println!("{} == {}", solution(i), o);
+
+    let i = "8
+    2
+    1 3 moon earth
+    2 6 sun earth";
+    let o = "1";
+    println!("{} == {}", solution(i), o);
+}
+#+end_src
+
+#+RESULTS:
+: 3 == 3
+: 3 == 3
+: 1 == 1
+
+** kattis - chess
+#+begin_src rust
+use std::collections::HashSet;
+
+#[derive(PartialEq, Eq, Hash, Debug)]
+struct Field {
+    x: u8,
+    y: u8,
+}
+impl Field {
+    fn parse(x: &str, y: &str) -> Self {
+        Field {
+            x: ('A'..='H')
+                .position(|l| l.to_string() == x.to_string())
+                .unwrap() as u8
+                + 1,
+            y: y.parse().unwrap(),
+        }
+    }
+    fn color(&self) -> String {
+        if (self.x + self.y) % 2 == 0 {
+            "black".to_string()
+        } else {
+            "white".to_string()
+        }
+    }
+    fn to_string(&self) -> String {
+        format!(
+            "{} {}",
+            ('A'..='H').nth(self.x as usize - 1).unwrap(),
+            self.y
+        )
+    }
+    fn get_diagonal_fields(&self) -> HashSet<Field> {
+        let mut h: HashSet<Field> = HashSet::new();
+        let d: Vec<(i8, i8)> = vec![(1, 1), (-1, 1), (1, -1), (-1, -1)];
+        for (dx, dy) in d {
+            let (mut x, mut y) = (self.x, self.y);
+            while (1..=8).contains(&x) && (1..=8).contains(&y) {
+                h.insert(Field { x, y });
+                x = (x as i8 + 1 * dx) as u8;
+                y = (y as i8 + 1 * dy) as u8;
+            }
+        }
+        h
+    }
+}
+
+fn solution(i: &str) -> String {
+    i.lines()
+        .skip(1)
+        .map(|s| {
+            let v = s.split_whitespace().collect::<Vec<&str>>();
+            let (start, end) = (Field::parse(v[0], v[1]), Field::parse(v[2], v[3]));
+            if start.color() != end.color() {
+                return "Impossible".to_string();
+            } else if start.to_string() == end.to_string() {
+                return format!("0 {}", start.to_string());
+            }
+            let s = &start.get_diagonal_fields();
+            if s.contains(&end) {
+                return format!("1 {} {}", start.to_string(), end.to_string());
+            }
+            let e = &end.get_diagonal_fields();
+            let tada = s.intersection(&e).collect::<Vec<&Field>>();
+            return format!(
+                "2 {} {} {}",
+                start.to_string(),
+                tada.first().unwrap().to_string(),
+                end.to_string()
+            );
+        })
+        .collect::<Vec<String>>()
+        .join("\n")
+}
+
+fn main() {
+    let i = "3
+E 2 E 3
+F 1 E 8
+A 3 A 3";
+    let o = "Impossible
+2 F 1 B 5 E 8
+0 A 3";
+    println!("{} == {}", solution(i), o);
+}
+#+end_src
+
+#+RESULTS:
+: Impossible
+: 2 F 1 B 5 E 8
+: 0 A 3 == Impossible
+: 2 F 1 B 5 E 8
+: 0 A 3
+** kattis - helpme
+#+begin_src rust
+use std::cmp::Ordering;
+
+fn solution(input: &str) -> String {
+    let mut whites = vec![];
+    let mut blacks = vec![];
+
+    input
+        .lines()
+        .rev()
+        .skip(1)
+        .step_by(2)
+        .enumerate()
+        .for_each(|(idx, l)| {
+            l.trim_matches('|')
+                .split('|')
+                .enumerate()
+                .for_each(|(idy, y)| {
+                    let f = y.chars().nth(1).unwrap();
+                    if f.is_alphabetic() {
+                        if f.is_uppercase() {
+                            whites.push(format!(
+                                "{}{}{}",
+                                f,
+                                ('a'..='h').nth(idy).unwrap(),
+                                idx + 1
+                            ));
+                        } else {
+                            blacks.push(format!(
+                                "{}{}{}",
+                                f.to_uppercase(),
+                                ('a'..='h').nth(idy).unwrap(),
+                                idx + 1
+                            ));
+                        }
+                    }
+                })
+        });
+
+    fn sorting_func(color: char) -> impl FnMut(&String, &String) -> Ordering {
+        let ord = if color == 'w' {
+            (Ordering::Less, Ordering::Greater)
+        } else {
+            (Ordering::Greater, Ordering::Less)
+        };
+        return move |a: &String, b: &String| -> Ordering {
+            let xa = a.chars().nth(0).unwrap();
+            let xb = b.chars().nth(0).unwrap();
+            let ya = a.chars().nth(1).unwrap();
+            let yb = b.chars().nth(1).unwrap();
+            let za: u8 = a.chars().nth(2).unwrap().to_string().parse().unwrap();
+            let zb: u8 = b.chars().nth(2).unwrap().to_string().parse().unwrap();
+
+            match (xa, xb) {
+                (q, w) if q == w => match (za, zb) {
+                    (o, p) if p == o => match (ya, yb) {
+                        (s, t) if s > t => Ordering::Greater,
+                        _ => Ordering::Less,
+                    },
+                    (o, p) if p > o => ord.0,
+                    _ => ord.1,
+                },
+                ('K', _) => Ordering::Less,
+                ('Q', 'R' | 'B' | 'N' | 'P') => Ordering::Less,
+                ('R', 'B' | 'N' | 'P') => Ordering::Less,
+                ('B', 'N' | 'P') => Ordering::Less,
+                ('N', 'P') => Ordering::Less,
+                (_, _) => Ordering::Greater,
+            }
+        };
+    }
+
+    blacks.sort_by(sorting_func('b'));
+    whites.sort_by(sorting_func('w'));
+
+    // dbg!(&whites, &blacks);
+
+    return format!("White:{}\nBlack:{}", &whites.join(","), &blacks.join(",")).replace("P", "");
+}
+
+fn main() {
+    let input = "+---+---+---+---+---+---+---+---+
+|.r.|:::|.b.|:q:|.k.|:::|.n.|:r:|
++---+---+---+---+---+---+---+---+
+|:p:|.p.|:p:|.p.|:p:|.p.|:::|.p.|
++---+---+---+---+---+---+---+---+
+|...|:::|.n.|:::|...|:::|...|:p:|
++---+---+---+---+---+---+---+---+
+|:::|...|:::|...|:::|...|:::|...|
++---+---+---+---+---+---+---+---+
+|...|:::|...|:::|.P.|:::|...|:::|
++---+---+---+---+---+---+---+---+
+|:P:|...|:::|...|:::|...|:::|...|
++---+---+---+---+---+---+---+---+
+|.P.|:::|.P.|:P:|...|:P:|.P.|:P:|
++---+---+---+---+---+---+---+---+
+|:R:|.N.|:B:|.Q.|:K:|.B.|:::|.R.|
++---+---+---+---+---+---+---+---+";
+    let output = "White:Ke1,Qd1,Ra1,Rh1,Bc1,Bf1,Nb1,a2,c2,d2,f2,g2,h2,a3,e4
+Black:Ke8,Qd8,Ra8,Rh8,Bc8,Ng8,Nc6,a7,b7,c7,d7,e7,f7,h7,h6";
+    println!("{}", dbg!(solution(input)) == output);
+
+    let input = "+---+---+---+---+---+---+---+---+
+|...|:::|...|:::|...|:::|...|:::|
++---+---+---+---+---+---+---+---+
+|:::|...|:::|...|:::|...|:::|...|
++---+---+---+---+---+---+---+---+
+|...|:::|...|:::|...|:::|...|:::|
++---+---+---+---+---+---+---+---+
+|:::|...|:::|...|:::|...|:::|.k.|
++---+---+---+---+---+---+---+---+
+|...|:::|...|:::|...|:::|...|:::|
++---+---+---+---+---+---+---+---+
+|:::|...|:::|...|:::|...|:::|...|
++---+---+---+---+---+---+---+---+
+|...|:::|...|:::|...|:::|...|:::|
++---+---+---+---+---+---+---+---+
+|:::|...|:::|...|:k:|...|:::|...|
++---+---+---+---+---+---+---+---+";
+    let output = "White:
+Black:Kh5,Ke1";
+    println!("{}", dbg!(solution(input)) == output);
+}
+
+#+end_src
+
+#+RESULTS:
+: [src/main.rs:101] solution(input) = "White:Ke1,Qd1,Ra1,Rh1,Bc1,Bf1,Nb1,a2,c2,d2,f2,g2,h2,a3,e4\nBlack:Ke8,Qd8,Ra8,Rh8,Bc8,Ng8,Nc6,a7,b7,c7,d7,e7,f7,h7,h6"
+: true
+: [src/main.rs:122] solution(input) = "White:\nBlack:Kh5,Ke1"
+: true
+
+** kattis - empleh
+#+begin_src rust
+#[derive(Copy, Clone, Debug)]
+struct Piece {
+    p: char,
+    x: u8,
+    y: u8,
+}
+
+impl Piece {
+    fn new(s: &str) -> Self {
+        // dbg!(s);
+        Piece {
+            p: if s.len() > 2 {
+                s.chars().nth(0).unwrap()
+            } else {
+                'P'
+            },
+            x: ('a'..='h')
+                .position(|x| x == s.chars().nth_back(1).unwrap())
+                .unwrap() as u8,
+            y: s.chars()
+                .nth_back(0)
+                .unwrap()
+                .to_string()
+                .parse::<u8>()
+                .unwrap()
+                - 1,
+        }
+    }
+}
+
+#[derive(Copy, Clone, Debug)]
+enum PlayerPiece {
+    Black(Piece),
+    White(Piece),
+}
+
+#[derive(Copy, Clone, Debug)]
+struct Field(Option<PlayerPiece>);
+
+impl Field {
+    fn get_char(self, default: char) -> char {
+        match self.0 {
+            Some(PlayerPiece::Black(p)) => p.p.to_lowercase().to_string().chars().nth(0).unwrap(),
+            Some(PlayerPiece::White(p)) => p.p,
+            _ => default,
+        }
+    }
+}
+
+#[derive(Debug)]
+struct Board {
+    fields: [[Field; 8]; 8],
+}
+
+impl Board {
+    fn new() -> Self {
+        Board {
+            fields: [[Field(None); 8]; 8],
+        }
+    }
+    fn insert(&mut self, piece: PlayerPiece) {
+        if let PlayerPiece::Black(p) = piece {
+            self.fields[p.y as usize][p.x as usize] = Field(Some(piece));
+        }
+        if let PlayerPiece::White(p) = piece {
+            self.fields[p.y as usize][p.x as usize] = Field(Some(piece));
+        }
+    }
+}
+
+impl std::fmt::Display for Board {
+    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+        write!(
+            f,
+            "+---+---+---+---+---+---+---+---+\n{}+---+---+---+---+---+---+---+---+",
+            self.fields
+                .into_iter()
+                .enumerate()
+                .map(|(idx, x)| format!(
+                    "|{}|\n",
+                    x.into_iter()
+                        .enumerate()
+                        .map(|(idy, y)| {
+                            let c = if (idx + idy) % 2 == 0 { ':' } else { '.' };
+                            format!("{}{}{}", c, y.get_char(c), c)
+                        })
+                        .collect::<Vec<String>>()
+                        .join("|")
+                ))
+                .rev()
+                .collect::<Vec<String>>()
+                .join("+---+---+---+---+---+---+---+---+\n")
+        )
+    }
+}
+
+fn solution(input: &str) -> String {
+    let mut board = Board::new();
+
+    input.lines().for_each(|l| {
+        if let [color, pieces] = l.split(":").collect::<Vec<&str>>()[..] {
+            pieces.split(",").for_each(|p| {
+                let piece = Piece::new(p);
+                let player_piece = if color == "White" {
+                    PlayerPiece::White(piece)
+                } else {
+                    PlayerPiece::Black(piece)
+                };
+
+                board.insert(player_piece);
+            });
+        }
+    });
+    // dbg!(&board);
+    format!("{}", board)
+}
+
+fn main() {
+    let input = "White:Ke1,Qd1,Ra1,Rh1,Bc1,Bf1,Nb1,a2,c2,d2,f2,g2,h2,a3,e4
+Black:Ke8,Qd8,Ra8,Rh8,Bc8,Ng8,Nc6,a7,b7,c7,d7,e7,f7,h7,h6";
+    let output = "+---+---+---+---+---+---+---+---+
+|.r.|:::|.b.|:q:|.k.|:::|.n.|:r:|
++---+---+---+---+---+---+---+---+
+|:p:|.p.|:p:|.p.|:p:|.p.|:::|.p.|
++---+---+---+---+---+---+---+---+
+|...|:::|.n.|:::|...|:::|...|:p:|
++---+---+---+---+---+---+---+---+
+|:::|...|:::|...|:::|...|:::|...|
++---+---+---+---+---+---+---+---+
+|...|:::|...|:::|.P.|:::|...|:::|
++---+---+---+---+---+---+---+---+
+|:P:|...|:::|...|:::|...|:::|...|
++---+---+---+---+---+---+---+---+
+|.P.|:::|.P.|:P:|...|:P:|.P.|:P:|
++---+---+---+---+---+---+---+---+
+|:R:|.N.|:B:|.Q.|:K:|.B.|:::|.R.|
++---+---+---+---+---+---+---+---+";
+    println!("{}", solution(input));
+
+    //     let input = "White:
+    // Black:Kh5,Ke1";
+    //     let output = "+---+---+---+---+---+---+---+---+
+    // |...|:::|...|:::|...|:::|...|:::|
+    // +---+---+---+---+---+---+---+---+
+    // |:::|...|:::|...|:::|...|:::|...|
+    // +---+---+---+---+---+---+---+---+
+    // |...|:::|...|:::|...|:::|...|:::|
+    // +---+---+---+---+---+---+---+---+
+    // |:::|...|:::|...|:::|...|:::|.k.|
+    // +---+---+---+---+---+---+---+---+
+    // |...|:::|...|:::|...|:::|...|:::|
+    // +---+---+---+---+---+---+---+---+
+    // |:::|...|:::|...|:::|...|:::|...|
+    // +---+---+---+---+---+---+---+---+
+    // |...|:::|...|:::|...|:::|...|:::|
+    // +---+---+---+---+---+---+---+---+
+    // |:::|...|:::|...|:k:|...|:::|...|
+    // +---+---+---+---+---+---+---+---+";
+    //     println!("{}", dbg!(solution(input)) == output);
+}
+#+end_src
+
+#+RESULTS:
+#+begin_example
+warning: unused variable: `output`
+   --> src/main.rs:122:9
+    |
+122 |     let output = "+---+---+---+---+---+---+---+---+
+    |         ^^^^^^ help: if this is intentional, prefix it with an underscore: `_output`
+    |
+    = note: `#[warn(unused_variables)]` on by default
+
+warning: unused variable: `output`
+   --> src/main.rs:122:9
+    |
+122 |     let output = "+---+---+---+---+---+---+---+---+
+    |         ^^^^^^ help: if this is intentional, prefix it with an underscore: `_output`
+    |
+    = note: `#[warn(unused_variables)]` on by default
+
++---+---+---+---+---+---+---+---+
+|.r.|:::|.b.|:q:|.k.|:::|.n.|:r:|
++---+---+---+---+---+---+---+---+
+|:p:|.p.|:p:|.p.|:p:|.p.|:::|.p.|
++---+---+---+---+---+---+---+---+
+|...|:::|.n.|:::|...|:::|...|:p:|
++---+---+---+---+---+---+---+---+
+|:::|...|:::|...|:::|...|:::|...|
++---+---+---+---+---+---+---+---+
+|...|:::|...|:::|.P.|:::|...|:::|
++---+---+---+---+---+---+---+---+
+|:P:|...|:::|...|:::|...|:::|...|
++---+---+---+---+---+---+---+---+
+|.P.|:::|.P.|:P:|...|:P:|.P.|:P:|
++---+---+---+---+---+---+---+---+
+|:R:|.N.|:B:|.Q.|:K:|.B.|:::|.R.|
++---+---+---+---+---+---+---+---+
+#+end_example
+** kattis - bijele
+#+begin_src rust
+fn solution(s: &str) -> String {
+    let target = vec![1, 1, 2, 2, 2, 8];
+    s.split_whitespace()
+        .enumerate()
+        .map(|(idx, v)| (target[idx] - v.parse::<i32>().unwrap()).to_string())
+        .collect::<Vec<String>>()
+        .join(" ")
+}
+
+fn main() {
+    let i = "0 1 2 2 2 7";
+    let o = "1 0 0 0 0 1";
+    println!("{} == {}", solution(i), o);
+    let i = "2 1 2 1 2 1";
+    let o = "-1 0 0 1 0 7";
+    println!("{} == {}", solution(i), o);
+}
+#+end_src

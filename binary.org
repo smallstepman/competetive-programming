@@ -1,0 +1,196 @@
+:PROPERTIES:
+:ID:       e80f7052-c7ab-4480-854d-397a1a9b0e26
+:END:
+#+TITLE: Binary
+
+* TOC :TOC:
+- [[#representation][Representation]]
+- [[#exercises][Exercises]]
+  - [[#leetcode-67-add-binary][Leetcode 67. Add Binary]]
+  - [[#multiply-or-divide-integer-by-2][Multiply or Divide integer by 2]]
+  - [[#check-if-number-is-divisable-by-powers-of-2][Check if number is divisable by powers of 2]]
+  - [[#or---setturn-on-i-th-bit-in-item-s][|OR - Set/"turn on" i-th bit in item S]]
+  - [[#and---check-if-i-th-bit-in-item-s-is-turned-on][&AND - Check if i-th bit in item S is "turned on"]]
+  - [[#not---clearturn-off-i-th-bit-in-item-s][~NOT - Clear/"turn off" i-th bit in item S]]
+  - [[#xor---toggleflip-i-th-bit-in-item-s][^XOR - toggle/"flip" i-th bit in item S]]
+  - [[#leastmost-significat-bit-position][Least/Most significat bit (position)]]
+  - [[#turn-onoff-all-bits-in-a-set-of-size-n][Turn ON/OFF all bits in a set of size N]]
+  - [[#enumerate-all-proper-subsets-of-a-given-bitmask][Enumerate all proper subsets of a given bitmask]]
+  - [[#count-1-bits][Count "1" bits]]
+  - [[#count-0-bits][Count "0" bits]]
+  - [[#count-trailing-0-bits][Count trailing "0" bits]]
+
+* Representation
+|     |  5 |  4 | 3 | 2 | 1 | 0 | -> {5,1} |
+| 54= |  1 |  0 | 0 | 0 | 1 | 0 |          |
+|     | 32 | 16 | 8 | 4 | 2 | 1 |          |
+|     |  F |  E | D | C | B | A | -> {F,B} |
+* Exercises
+** [[https://leetcode.com/problems/add-binary/][Leetcode 67. Add Binary]]
+#+begin_quote
+Given two binary strings a and b, return their sum as a binary string.
+#+end_quote
+#+begin_src python
+class Solution:
+    def addBinary(self, a: str, b: str) -> str:
+        return "{:b}".format(int(a,2) + int(b,2))
+#+end_src
+*** TODO COMMENT implement with shift operator <<
+** Multiply or Divide integer by 2
+#+BEGIN_SRC python :results output
+a = 100
+print(a << 1)
+a >>= 2
+print(a)
+#+END_SRC
+
+#+RESULTS:
+: 200
+: 25
+** [[https://stackoverflow.com/questions/3072665/bitwise-and-in-place-of-modulus-operator][Check if number is divisable by powers of 2]]
+** |OR - Set/"turn on" i-th bit in item S
+#+BEGIN_SRC python :results output
+S = 34
+i = shifter = 3
+turner = 1 << shifter
+S_v2 = S | turner
+print(S, f"{S:#b}")
+print("", turner, f"{turner:>08b}")
+print(" | --------")
+print(S_v2, f"{S_v2:#b}")
+#+END_SRC
+
+#+RESULTS:
+: 34 0b100010
+:  8 00001000
+:  | --------
+: 42 0b101010
+** &AND - Check if i-th bit in item S is "turned on"
+#+BEGIN_SRC python :results output
+S = 34
+i = shifter = 5
+turner = 1 << shifter
+S_v2 = S & turner
+print(S, f"{S:#b}")
+print(turner, f"{turner:>08b}")
+print(" & --------")
+print(S_v2, f"{S_v2:>08b}")
+print(S_v2 == turner)
+#+END_SRC
+
+#+RESULTS:
+: 34 0b100010
+: 32 00100000
+:  & --------
+: 32 00100000
+: True
+** ~NOT - Clear/"turn off" i-th bit in item S
+#+BEGIN_SRC python :results output
+S = 34 | 0b000000
+i = shifter = 0b100000
+turner = ~shifter
+S_v2 = S & turner
+print(f" {S} {S:#b}")
+print(f"{turner} {turner:>08b}")
+print("  & --------")
+print(f"  {S_v2} {S_v2:>08b}")
+#+END_SRC
+
+#+RESULTS:
+:  34 0b100010
+: -33 0-100001
+:   & --------
+:   2 00000010
+** ^XOR - toggle/"flip" i-th bit in item S
+#+BEGIN_SRC python :results output
+S = 34 | 0b000000
+i = shifter = 0b1101010
+turner = shifter
+S_v2 = S ^ turner
+print(f" {S}  {S:b}")
+print(f"{turner} {turner:b}")
+print("  & -------")
+print(f" {S_v2} {S_v2:b}")
+#+END_SRC
+
+#+RESULTS:
+:  34  100010
+: 106 1101010
+:   & -------
+:  72 1001000
+
+** Least/Most significat bit (position)
+#+BEGIN_SRC python :results output
+S = 300
+print(f"{S:>03} {S:>010b}")
+lsb = S & -S
+lsb_pos = lsb.bit_length() - 1
+msb_pos = S.bit_length() - 1
+msb = 1 << msb_pos
+print(f"LSB {lsb:>010b}, LSB position {lsb_pos}")
+print(f"MSB {msb:>010b}, MSB position {msb_pos}")
+#+END_SRC
+
+#+RESULTS:
+: 300 0100101100
+: 0
+: LSB 0000000100, LSB position 2
+: MSB 0100000000, MSB position 8
+
+** Turn ON/OFF all bits in a set of size N
+#+BEGIN_SRC python :results output
+S = 300
+turn_on = (1 << S.bit_length()) - 1
+turn_off = (1 >> S.bit_length())
+print(f"{S:>03} {S:>010b}")
+print(f" ON {turn_on:>010b}")
+print(f"OFF {turn_off:>010b}")
+#+END_SRC
+
+#+RESULTS:
+: 300 0100101100
+:  ON 0111111111
+: OFF 0000000000
+
+** Enumerate all proper subsets of a given bitmask
+#+BEGIN_SRC python :results output
+a = subset = 112
+print(f"{a:>012b} {a}")
+while a:
+    msb = 1 << (a.bit_length() - 1)
+    a ^= msb
+    print("{0:>012b} {0}".format(msb))
+#+END_SRC
+
+#+RESULTS:
+: 000001110000 112
+: 000001000000 64
+: 000000100000 32
+: 000000010000 16
+
+** Count "1" bits
+#+BEGIN_SRC python :results output
+a = 123123123
+print(f"{bin(a).count('1')}, {a:b}")
+#+END_SRC
+
+#+RESULTS:
+: 17, 111010101101011010110110011
+
+** Count "0" bits
+#+BEGIN_SRC python :results output
+a = 123123123
+print(f"{bin(a).count('0')}, {a:b}")
+#+END_SRC
+
+#+RESULTS:
+: 11, 111010101101011010110110011
+
+** Count trailing "0" bits
+#+BEGIN_SRC python :results output
+a = 12312312
+print(f"{bin(a)[::-1].index('1')}, {a:b}")
+#+END_SRC
+
+#+RESULTS:
+: 3, 101110111101111011111000

@@ -1,0 +1,67 @@
+:PROPERTIES:
+:ID:       e6efeb95-d4f3-4b89-af9e-e5e60d30c11b
+:END:
+#+TITLE: Easy
+
+
+* 1 - Read in a double, echo it with minimum field of 7 and 3 digits after the decimal point
+#+begin_src python :results output
+def solution(n):
+    return f"{round(n,3): >7}"
+    return f"{round(n,3)}".rjust(7)
+print(solution(1.4732))
+print(solution(15.324547327))
+#+end_src
+
+#+RESULTS:
+:   1.473
+:  15.325
+
+https://doc.rust-lang.org/std/fmt/#width
+#+begin_src rust
+fn solution(n: f32) -> String {
+    format!("{:>7.3}", n)
+}
+
+fn main() {
+    println!("{}", solution(1.4732));
+    println!("{}", solution(15.32457327));
+}
+#+end_src
+
+#+RESULTS:
+:   1.473
+:  15.325
+
+* 2 - given an integer n (n <= 15) print x to n digits after the decimal point (rounded). (e.g. for n = 2, print 3.14, for n = 4 print 3.1316, for n = 5 print 3.14159)
+#+begin_src python :results output
+from math import pi
+def solution(n):
+    return round(pi, n)
+
+print(solution(2))
+print(solution(4))
+print(solution(5))
+#+end_src
+
+#+RESULTS:
+: 3.14
+: 3.1416
+: 3.14159
+
+#+begin_src rust
+fn solution(n: usize) -> String {
+    format!("{:.dp$}", std::f32::consts::PI, dp = n)
+}
+
+fn main() {
+    println!("{}", solution(3));
+    println!("{}", solution(4));
+    println!("{}", solution(5));
+}
+#+end_src
+
+#+RESULTS:
+: 3.142
+: 3.1416
+: 3.14159
