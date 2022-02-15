@@ -2,7 +2,6 @@
 :ID:       9781c339-1729-43eb-97b4-e2ff2bbe44a2
 :END:
 #+title: rust cp
-* COMMENT competitive programming
 ** kattis - thelastproblem
 #+begin_src rust
 fn solution(s: &str) -> String {
