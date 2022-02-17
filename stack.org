@@ -1,0 +1,45 @@
+#+TITLE: Stack
+
+
+* Parenthesis validity
+#+BEGIN_SRC python :results output :async t
+def isValid(s: str) -> bool:
+    closing = ')}]'
+    opening = '([{'
+    par = {
+        '(':')',
+        '{':'}',
+        '[':']',
+    }
+
+    # l = list(s)
+    stack = []
+
+    if s == '':
+        return True
+
+    if s[0] in closing:
+        return False
+
+    for i in range(len(s)):
+        stack.append(s[i])
+        if s[i] in closing:
+            if len(stack) == 1:
+                return False
+            if stack[-2] in opening:
+                if par[stack[-2]] == s[i]:
+                    stack.pop()
+                    stack.pop()
+                    continue
+        # else:
+ #           return False
+    print(stack)
+    return stack == []
+
+print(isValid('[]()[][][{{{((()))}}}]['))
+#+END_SRC
+
+#+RESULTS:
+: ['[']
+: False
+* Infix/Prefix/Postfix converter
