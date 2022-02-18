@@ -1829,3 +1829,238 @@ fn test_case_8() {
 }
 #+end_src
 
+* leetcode - 122. Best Time to Buy and Sell Stock II
+https://leetcode.com/problems/best-time-to-buy-and-sell-stock-ii
+#+begin_src rust
+impl Solution {
+    pub fn max_profit(prices: Vec<i32>) -> i32 {
+        prices.as_slice()
+              .windows(2)
+              .fold(0, |acc, x| if x[0] < x[1] {x[1] - x[0] + acc} else {acc})
+    }
+}
+#+end_src
+* leetcode - 189. Rotate Array
+https://leetcode.com/problems/rotate-array/
+#+begin_src rust
+impl Solution {
+    pub fn rotate(nums: &mut Vec<i32>, k: i32) {
+        nums.rotate_right(k as usize);
+    }
+}
+#+end_src
+- Try to come up with as many solutions as you can. There are at least three different ways to solve this problem.
+- Could you do it in-place with O(1) extra space?
+
+* leetcode - 217. Contains Duplicate
+https://leetcode.com/problems/contains-duplicate
+[[https://leetcode.com/problems/contains-duplicate/discuss/1473303/Rust-Simple-solution-using-sorting][interesting remark:]]
+#+begin_quote
+Although using HashSet has a complexity of O(N), it has a very large constant factor due to the slow hashing algorithm. So in many cases, especially with smaller arrays it's faster in practice to sort the array
+#+end_quote
+
+#+begin_src rust
+impl Solution {
+    pub fn contains_duplicate(nums: Vec<i32>) -> bool {
+        let mut h = std::collections::HashMap::new();
+        for n in nums {
+            let e = h.entry(n);
+            if let std::collections::hash_map::Entry::Occupied(_) = e {
+                return true;
+            } else {
+                e.or_insert(1);
+            }
+        }
+        false
+    }
+}
+#+end_src
+
+#+RESULTS:
+: false
+* leetcode - 136. Single Number
+#+begin_src rust
+impl Solution {
+    pub fn single_number(nums: Vec<i32>) -> i32 {
+        assert_eq!(5, 0 ^ 5);
+        assert_eq!(0, 5 ^ 5); // XOR'ing a number with itself yields zero
+        assert_eq!(6, 10 ^ 10 ^ 6 ^ 2 ^ 8 ^ 8 ^ 2);
+        assert_eq!(6, (((10 ^ 10 ^ 6) ^ 2) ^ (8 ^ 8 ^ 2))); // XOR is associative, i.e. (x^y)^x = x^(y^x) = y
+        nums.iter().fold(0, |acc, x| acc ^ x)
+    }
+}
+#+end_src
+* leetcode - 350. Intersection of Two Arrays II
+https://leetcode.com/problems/intersection-of-two-arrays-ii/
+#+begin_src rust
+/// Time Complexity:    O(max(`len1`, `len2`))
+/// Space Complexiyt:   O(26) ~ O(1)
+impl Solution {
+    pub fn intersect(nums1: Vec<i32>, nums2: Vec<i32>) -> Vec<i32> {
+        let mut h = std::collections::HashMap::new();
+        for n in nums1 {
+            let e = h.entry(n).or_insert((0,0));
+            ,*e = (e.0 + 1, 0);
+        }
+        for n in nums2 {
+            let e = h.entry(n).or_insert((0,0));
+            ,*e = (e.0, e.1 + 1);
+        }
+        let mut r = vec![];
+        for (k,v) in h {
+            let min = std::cmp::min(v.0, v.1);
+            if min > 0 {
+                r.extend(vec![k; min]);
+            }
+        }
+        r
+    }
+}
+#+end_src
+- What if the given array is already sorted? How would you optimize your algorithm?
+  - i'd iterate over both arrays simultaneously, while pushing the needle in array which points to value bigger than the other array
+- What if nums1's size is small compared to nums2's size? Which algorithm is better?
+- What if elements of nums2 are stored on disk, and the memory is limited such that you cannot load all elements into the memory at once?
+** COMMENT cool
+- https://leetcode.com/problems/intersection-of-two-arrays-ii/discuss/1469616/Short-and-clean-Rust-solution-(n-log-n-0ms)
+* leetcode - 66. Plus One
+https://leetcode.com/problems/plus-one
+#+begin_src rust
+impl Solution {
+    pub fn plus_one(mut digits: Vec<i32>) -> Vec<i32> {
+        for n in digits.iter_mut().rev() {
+            if *n == 9 {
+                *n = 0;
+            } else {
+                *n += 1;
+                return digits;
+            }
+        }
+        digits.insert(0, 1);
+        digits
+    }
+}
+#+end_src
+* leetcode - 283. Move Zeroes
+https://leetcode.com/problems/move-zeroes/
+#+begin_src rust
+impl Solution {
+    pub fn move_zeroes(nums: &mut Vec<i32>) {
+        let c = nums.iter().filter(|x| *x == &0).count();
+        nums.retain(|x| *x != 0);
+        nums.extend(vec![0; c]);
+    }
+}
+#+end_src
+** comment cool
+- using =Vec.swap()= https://leetcode.com/problems/move-zeroes/discuss/521275/Rust-Solution
+* leetcode - 1. Two Sum
+https://leetcode.com/problems/two-sum/
+#+begin_src rust
+impl Solution {
+    pub fn two_sum2(mut nums: Vec<i32>, target: i32) -> Vec<i32> {
+        nums.sort_unstable();
+        let (mut idn, mut idr) = (0, nums.len()-1);
+        let (mut a, mut b) = (0, 0);
+        while a+b != target {
+            a = nums[idn];
+            b = nums[idr];
+            if a + b > target {
+                idr -= 1;
+            } else if a + b < target{
+                idn += 1;
+            }
+        }
+        vec![idn as i32, idr as i32]
+    }
+
+    pub fn two_sum(mut nums: Vec<i32>, target: i32) -> Vec<i32> {
+        use std::collections::HashMap;
+        let mut h: HashMap<i32, i32> = HashMap::new();
+        for (i,n) in nums.iter().enumerate() {
+            let aim = target - n;
+            match h.get(&aim) {
+                Some(v) => return vec![i as i32, *v],
+                None => h.insert(*n, i as i32)
+            };
+        }
+        unreachable!()
+    }
+}
+#+end_src
+*
+* leetcode - 36. Valid Sudoku
+https://leetcode.com/problems/valid-sudoku/
+#+begin_src rust
+impl Solution {
+    pub fn is_valid_sudoku(board: Vec<Vec<char>>) -> bool {
+        macro_rules! check {
+            ($vector:ident) => {
+                for v in $vector.as_slice().windows(2) {
+                    if v[0] == v[1] && v[0] != '.' {
+                        return false;
+                    }
+                }
+            }
+        }
+
+        // check rows
+        for row in &board {
+            let mut row = row.clone();
+            row.sort();
+            check!(row);
+        }
+
+        // check cols
+        for i in 0..9 {
+            let mut col = vec![];
+            for row in &board {
+                col.push(row[i]);
+            }
+            col.sort();
+            check!(col);
+        }
+
+        // check squares
+        for chunk in board.as_slice().chunks(3) {
+            for col_chunk in (0..9).collect::<Vec<usize>>().as_slice().chunks(3) {
+                let mut square = vec![];
+                if let [a,b,c] = col_chunk {
+                    for rc in chunk {
+                        square.extend(vec![rc[*a], rc[*b], rc[*c]]);
+                    }
+                }
+                square.sort();
+                check!(square);
+            }
+        }
+
+        true
+    }}#+end_src
+** comment todo cool stuff, be sure to check it out
+- https://leetcode.com/problems/valid-sudoku/discuss/1602917/rust-rust-rust
+- https://leetcode.com/problems/valid-sudoku/discuss/440491/rust
+- https://leetcode.com/problems/valid-sudoku/discuss/1261934/Rust-Solution-using-Three-1-D-Arrays-with-Bit-Manipulation-instead-of-HashSet
+- https://leetcode.com/problems/valid-sudoku/discuss/1602917/rust-rust-rust
+- https://leetcode.com/problems/valid-sudoku/discuss/1516143/Very-simple-and-elegant-rust-solution-with-just-one-loop-and-HashSets
+- https://leetcode.com/problems/valid-sudoku/discuss/1583183/Rust-Solution-with-too-many-Iterators
+* leetcode - 48. Rotate Image
+https://leetcode.com/problems/rotate-image/
+#+begin_src rust
+impl Solution {
+    pub fn rotate(matrix: &mut Vec<Vec<i32>>) {
+        let n = matrix.len();
+        for i in 0..n / 2 {
+            let (t, b) = (i, n - i - 1); // rows (top, bottom)
+            let (l, r) = (i, n - i - 1); // cols (left, right)
+            for shift in i..n - i - 1 {
+                let temp = matrix[t][l + shift];
+                matrix[t][l + shift] = matrix[b - shift][l];
+                matrix[b - shift][l] = matrix[b][r - shift];
+                matrix[b][r - shift] = matrix[t + shift][r];
+                matrix[t + shift][r] = temp;
+            }
+        }
+    }
+}
+#+end_src
