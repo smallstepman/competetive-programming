@@ -2,7 +2,7 @@
 :ID:       9781c339-1729-43eb-97b4-e2ff2bbe44a2
 :END:
 #+title: rust cp
-** kattis - thelastproblem
+* kattis - thelastproblem
 #+begin_src rust
 fn solution(s: &str) -> String {
     format!("Thank you, {}, and farewell!", s)
@@ -17,7 +17,7 @@ fn main() {
 #+RESULTS:
 : Thank you, Cinderilla, and farewell!
 
-** kattis - filip
+* kattis - filip
 #+begin_src rust
 fn solution(s: &str) -> u32 {
     s.split_whitespace()
@@ -38,7 +38,7 @@ fn main() {
 
 #+RESULTS:
 : 511
-** kattis - onechicken
+* kattis - onechicken
 #+begin_src rust :crates '((itertools . "0.10.3"))
 use itertools::Itertools;
 
@@ -72,7 +72,7 @@ fn main() {
 #+RESULTS:
 : error: Could not compile `cargoMo2cxE`.
 
-** kattis - lineup
+* kattis - lineup
 #+BEGIN_SRC rust :toolchain 'nightly
 #![feature(is_sorted)]
 
@@ -126,7 +126,7 @@ fn main() {
 : "DESCENDING"
 : "NEITHER"
 : "ASCENDING"
-** kattis - pokerhand
+* kattis - pokerhand
 #+begin_src rust
 use std::collections::HashMap;
 use std::hash::Hash;
@@ -168,7 +168,7 @@ fn main() {
 
 #+RESULTS:
 : 4
-** kattis - sevenwonders
+* kattis - sevenwonders
 #+begin_src rust
 use std::collections::HashMap;
 use std::hash::Hash;
@@ -214,7 +214,7 @@ fn main() {
 
 #+RESULTS:
 : 21
-** kattis - vote
+* kattis - vote
 #+begin_src rust
 fn solution(mut s: Vec<usize>) -> Vec<String> {
     (0..s[0]).map(|i| {
@@ -268,7 +268,7 @@ fn main() {
 
 #+RESULTS:
 
-** kattis - artichoke
+* kattis - artichoke
 #+begin_src rust :crates
 fn formula(p: u32, a: u32, b: u32, c: u32, d: u32, k: u32) -> f64 {
     (p as f64) * (((a*k+b) as f64).sin()+((c*k+d) as f64).cos()+2.0)
@@ -314,8 +314,8 @@ fn main() {
 
 #+RESULTS:
 
-** kattis - basicprogramming1
-*** 1
+* kattis - basicprogramming1
+** 1
 #+begin_src rust :tangle ~/Desktop/trash/basicprogramming1.rs
 #![allow(unused_variables, dead_code)]
 
@@ -434,7 +434,7 @@ fn main() {
 #+RESULTS:
 : error: Could not compile `cargo9An818`.
 
-*** 2
+** 2
 #+begin_src rust :tangle ~/Desktop/trash/basicprogramming1.rs
 #![allow(unused_variables, dead_code)]
 
@@ -566,7 +566,7 @@ fn main() {
 : helloworld == helloworld
 : Cyclic == Cyclic
 
-** kattis - treasurehunt
+* kattis - treasurehunt
 #+begin_src rust
 #![allow(unused_variables,dead_code)]
 
@@ -655,7 +655,7 @@ fn main() {
 
 #+RESULTS:
 : 3 == 3
-** kattis - trainpassengers
+* kattis - trainpassengers
 #+begin_src rust
 #![allow(unused_must_use, unused_variables, unused_comparisons)]
 
@@ -848,7 +848,7 @@ impossible == impossible
 impossible == impossible
 #+end_example
 
-** kattis - friday
+* kattis - friday
 - every year starts on a Sunday
 #+begin_src rust
 fn solution(i: &str) -> String {
@@ -889,7 +889,7 @@ fn main() {
     assert_eq!(solution(i), o);
 }
 #+end_src
-** kattis - skener
+* kattis - skener
 #+begin_src rust
 fn solution(i: &str) -> String {
     if let [_, _, zr, zc, data @ ..] = i.split_whitespace().collect::<Vec<&str>>().as_slice() {
@@ -934,7 +934,7 @@ x.x
     println!("{} == {}", solution(i), o);
 }
 #+end_src
-** kattis - chopin
+* kattis - chopin
 #+begin_src rust
 use std::collections::HashMap;
 
@@ -983,7 +983,7 @@ Case 3: UNIQUE";
     println!("{} == {}", solution(i), o);
 }
 #+end_src
-** kattis - memory match
+* kattis - memory match
 #+begin_src rust
 use std::collections::{HashMap, HashSet};
 
@@ -1048,7 +1048,7 @@ fn main() {
 : 3 == 3
 : 1 == 1
 
-** kattis - chess
+* kattis - chess
 #+begin_src rust
 use std::collections::HashSet;
 
@@ -1142,7 +1142,7 @@ A 3 A 3";
 : 0 A 3 == Impossible
 : 2 F 1 B 5 E 8
 : 0 A 3
-** kattis - helpme
+* kattis - helpme
 #+begin_src rust
 use std::cmp::Ordering;
 
@@ -1275,7 +1275,7 @@ Black:Kh5,Ke1";
 : [src/main.rs:122] solution(input) = "White:\nBlack:Kh5,Ke1"
 : true
 
-** kattis - empleh
+* kattis - empleh
 #+begin_src rust
 #[derive(Copy, Clone, Debug)]
 struct Piece {
@@ -1475,7 +1475,7 @@ warning: unused variable: `output`
 |:R:|.N.|:B:|.Q.|:K:|.B.|:::|.R.|
 +---+---+---+---+---+---+---+---+
 #+end_example
-** kattis - bijele
+* kattis - bijele
 #+begin_src rust
 fn solution(s: &str) -> String {
     let target = vec![1, 1, 2, 2, 2, 8];
@@ -1495,3 +1495,337 @@ fn main() {
     println!("{} == {}", solution(i), o);
 }
 #+end_src
+* kattis -
+#+begin_src rust
+enum Pixel {
+    Point(String),
+    Dot,
+    Hyphen,
+    Pipe,
+    Plus,
+}
+
+impl From<char> for Pixel {
+    fn from(c: char) -> Self {
+        if c == '.' {
+            Pixel::Dot
+        } else {
+            Pixel::Point(c.to_string())
+        }
+    }
+}
+
+impl std::fmt::Display for Pixel {
+    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+        write!(
+            f,
+            "{}",
+            match self {
+                Pixel::Dot => ".",
+                Pixel::Hyphen => "-",
+                Pixel::Pipe => "|",
+                Pixel::Plus => "+",
+                Pixel::Point(v) => v.as_str(),
+            }
+        )
+    }
+}
+
+#[derive(Clone, Copy, Debug)]
+struct Point {
+    x: usize,
+    y: usize,
+    c: char,
+}
+
+struct Image {
+    pixels: Vec<Vec<Pixel>>,
+    points: Vec<Point>,
+}
+
+impl Image {
+    fn parse(case: &str) -> Self {
+        let mut points = case
+            .lines()
+            .enumerate()
+            .map(|(idx, l)| {
+                l.chars()
+                    .enumerate()
+                    .filter_map(|(idc, c)| {
+                        if let Pixel::Point(p) = Pixel::from(c) {
+                            return Some(Point {
+                                x: idc,
+                                y: idx,
+                                c: p.chars().nth(0).unwrap(),
+                            });
+                        }
+                        None
+                    })
+                    .collect::<Vec<Point>>()
+            })
+            .flatten()
+            .collect::<Vec<_>>();
+        points.sort_by_key(|p| p.c);
+        Image {
+            pixels: case
+                .lines()
+                .map(|l| l.chars().map(|c| Pixel::from(c)).collect::<Vec<Pixel>>())
+                .collect::<Vec<_>>(),
+            points: points,
+        }
+    }
+
+    fn draw_horizontal(&mut self, row: usize, columns: (usize, usize)) {
+        self.pixels[row][if columns.0 < columns.1 {
+            columns.0..=columns.1
+        } else {
+            columns.1..=columns.0
+        }]
+        .iter_mut()
+        .for_each(|v| {
+            *v = match v {
+                Pixel::Dot | Pixel::Hyphen => Pixel::Hyphen,
+                Pixel::Pipe | Pixel::Plus => Pixel::Plus,
+                Pixel::Point(v) => Pixel::Point(v.to_owned()),
+            };
+        });
+    }
+
+    fn draw_vertical(&mut self, column: usize, rows: (usize, usize)) {
+        self.pixels[if rows.0 < rows.1 {
+            rows.0..rows.1
+        } else {
+            rows.1..rows.0
+        }]
+        .iter_mut()
+        .for_each(|row| {
+            row[column] = match &row[column] {
+                Pixel::Dot | Pixel::Pipe => Pixel::Pipe,
+                Pixel::Hyphen | Pixel::Plus => Pixel::Plus,
+                Pixel::Point(v) => Pixel::Point(v.to_owned()),
+            }
+        });
+    }
+
+    fn solve(&mut self) {
+        let points = self.points.clone();
+        let mut points = points.windows(2);
+        while let Some([a, b]) = points.next() {
+            match (a, b) {
+                (a, b) if a.y == b.y => self.draw_horizontal(a.y, (a.x, b.x)),
+                (a, b) if a.x == b.x => self.draw_vertical(a.x, (a.y, b.y)),
+                (mut a, mut b) => {
+                    if a.x > b.x || a.y > b.y {
+                        std::mem::swap(&mut a, &mut b);
+                    }
+                    self.draw_horizontal(a.y, (a.x, b.x));
+                    self.draw_vertical(b.x, (a.y, b.y));
+                    self.pixels[a.y][b.x] = Pixel::Plus;
+                    println!("{}", self.to_string());
+                }
+            };
+        }
+    }
+}
+
+impl std::fmt::Display for Image {
+    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+        write!(
+            f,
+            "{}",
+            self.pixels
+                .iter()
+                .map(|r| r.iter().map(|p| p.to_string()).collect::<String>())
+                .collect::<Vec<String>>()
+                .join("\n")
+        )
+    }
+}
+
+fn solution(s: &str) -> String {
+    s.split("\n\n")
+        .map(Image::parse)
+        .map(|mut i| {
+            i.solve();
+            i.to_string()
+        })
+        .collect::<Vec<String>>()
+        .join("\n\n")
+}
+
+fn main() -> std::io::Result<()> {
+    let mut i = String::new();
+    std::io::Read::read_to_string(&mut std::io::stdin(), &mut i)?;
+    println!("{}", solution(i.as_str()));
+    let nums = vec![1, 2];
+    let mut h = std::collections::HashMap::new();
+    for n in nums {
+        let e = h.entry(n);
+        if let std::collections::hash_map::Entry::Occupied(_) = e {
+            return true;
+        } else {
+            e.or_insert(1);
+        }
+    }
+    let x = h.keys();
+    Ok(())
+}
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+
+    #[test]
+    fn test_name() {}
+}
+
+#[test]
+fn test_case_1() {
+    let i = ".....0.......1
+..............
+..............
+.....3.......2
+
+..0.....4......
+...............
+...............
+...............
+..2.....3.....7
+...............
+...............
+...............
+..1.....5.....6
+
+..0...............7...........8....d
+......4................3............
+....................................
+....................................
+...........a..................9.....
+....................................
+..1....................2............
+....................................
+......5...........6.................
+....................................
+...........b.......................c";
+    let o = ".....0-------1
+.............|
+.............|
+.....3-------2
+
+..0.....4......
+..|.....|......
+..|.....|......
+..|.....|......
+..2-----3.....7
+..|.....|.....|
+..|.....|.....|
+..|.....|.....|
+..1.....5-----6
+
+..0...............7-----------8....d
+..|...4-----------+----3......|....|
+..|...|...........|....|......|....|
+..|...|...........|....|......|....|
+..|...|....a------+----+------9....|
+..|...|....|......|....|...........|
+..1---+----+------+----2...........|
+......|....|......|................|
+......5----+------6................|
+...........|.......................|
+...........b-----------------------c";
+    assert_eq!(solution(i), o);
+}
+
+#[test]
+fn test_case_2() {
+    let i = ".....0.......1
+
+..1......0
+2.........
+
+..1..3...0
+2.........";
+
+    let o = ".....0-------1
+
+..1------0
+2-+.......
+
++-1--3---0
+2-+.......";
+    assert_eq!(solution(i), o);
+}
+
+#[test]
+fn test_case_3() {
+    let i = "1...
+....
+...0";
+
+    let o = "1--+
+...|
+...0";
+    assert_eq!(solution(i), o);
+}
+
+#[test]
+fn test_case_4() {
+    let i = "0...
+....
+...1";
+
+    let o = "0--+
+...|
+...1";
+    assert_eq!(solution(i), o);
+}
+
+#[test]
+fn test_case_5() {
+    let i = "0...
+....
+...1";
+
+    let o = "0--+
+...|
+...1";
+    assert_eq!(solution(i), o);
+}
+
+#[test]
+fn test_case_6() {
+    let i = "...0
+....
+1...";
+
+    let o = "+--0
+|...
+1..,";
+    assert_eq!(solution(i), o);
+}
+
+#[test]
+fn test_case_7() {
+    let i = "1...
+....
+...0";
+
+    let o = "1--+
+...|
+...0";
+    assert_eq!(solution(i), o);
+}
+
+#[test]
+fn test_case_8() {
+    let i = "...1
+....
+0...";
+
+    let o = "+--1
+|...
+0...";
+    assert_eq!(solution(i), o);
+}
+#+end_src
+
