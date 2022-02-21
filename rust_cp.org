@@ -2050,17 +2050,180 @@ https://leetcode.com/problems/rotate-image/
 impl Solution {
     pub fn rotate(matrix: &mut Vec<Vec<i32>>) {
         let n = matrix.len();
-        for i in 0..n / 2 {
-            let (t, b) = (i, n - i - 1); // rows (top, bottom)
-            let (l, r) = (i, n - i - 1); // cols (left, right)
-            for shift in i..n - i - 1 {
-                let temp = matrix[t][l + shift];
-                matrix[t][l + shift] = matrix[b - shift][l];
-                matrix[b - shift][l] = matrix[b][r - shift];
-                matrix[b][r - shift] = matrix[t + shift][r];
-                matrix[t + shift][r] = temp;
+        for i in 0..n/2 {
+            let (t,b) = (i, n-i-1); // rows (top, bottom)
+            let (l,r) = (i, n-i-1); // cols (left, right)
+            for shift in 0..n-i*2-1 {
+                let temp = matrix[t][l+shift];
+                matrix[t][l+shift] = matrix[b-shift][l];
+                matrix[b-shift][l] = matrix[b][r-shift];
+                matrix[b][r-shift] = matrix[t+shift][r];
+                matrix[t+shift][r] = temp;
             }
         }
+    }
+}#+end_src
+** comment cool stuff
+- [[https://leetcode.com/problems/rotate-image/discuss/627819/Rust-double-for-loops-bitwise-O(1)-space.-(0-ms-faster-than-100.)][interesting usage of =!x = -x-1=]]
+- [[https://leetcode.com/problems/rotate-image/discuss/435653/rust-with-std%3A%3Amem%3A%3Aswap-in-2D-vector][using =std::mem::swap=]]
+
+*** transpose array
+:PROPERTIES:
+:ID:       b39c3b48-7610-45a0-aa21-150d751c3e62
+:END:
+#+begin_src rust
+fn main() {
+    let mut v = vec![vec![1,2,3], vec![8,7,6]];
+    transpose(&mut v);
+    println!("{:?}", v);
+    let mut v = vec![vec![1,2,3], vec![4,5,6], vec![7,8,9]];
+    transpose(&mut v);
+    println!("{:?}", v);
+    for r in v.iter_mut() {
+       r.reverse();
+    }
+    println!("{:?}", v);
+}
+
+fn transpose(matrix: &mut Vec<Vec<i32>>) {
+    let n = matrix.len();
+    for y in 0..n {
+        for x in y..n {
+            let tmp = matrix[x][y];
+            matrix[x][y] = matrix[y][x];
+            matrix[y][x] = tmp;
+        }
+    }
+}
+#+end_src
+
+#+RESULTS:
+: [[1, 8, 3], [2, 7, 6]]
+: [[1, 4, 7], [2, 5, 8], [3, 6, 9]]
+: [[7, 4, 1], [8, 5, 2], [9, 6, 3]]
+
+[[1,2,3]
+![4,5,6],
+![7,8,9]];
+
+[[1, 4, 7],
+ [2, 5, 8],
+ [3, 6, 9]]
+*** rotate using XOR
+#+begin_src rust
+fn main() {
+    let mut x = 5;
+    x ^= 5;
+    println!("{}", x);
+
+    let mut v = vec![vec![1,2,3], vec![8,7,6]];
+    rotate(&mut v);
+    println!("{:?}", v);
+    let mut v = vec![vec![1,2,3], vec![4,5,6], vec![7,8,9]];
+    rotate(&mut v);
+    println!("{:?}", v);
+}
+
+fn rotate(matrix: &mut Vec<Vec<i32>>) {
+    matrix.reverse();
+    for i in 0..matrix.len() {
+        for j in i+1..matrix.len() {
+            println!("i={} j={}",i,j);
+            matrix[i][j] ^= matrix[j][i];
+            matrix[j][i] = matrix[i][j] ^ matrix[j][i];
+            matrix[i][j] ^= matrix[j][i];
+        }
+    }
+}
+#+end_src
+
+#+RESULTS:
+: 0e
+: i=0 j=1
+: [[8, 1, 6], [7, 2, 3]]
+: i=0 j=1
+: i=0 j=2
+: i=1 j=2
+: [[7, 4, 1], [8, 5, 2], [9, 6, 3]]
+* leetcode - reverse integer
+#+begin_src rust
+impl Solution {
+    pub fn reverse(x: i32) -> i32 {
+        x.signum() * x.to_string()
+                      .chars()
+                      .filter(|c| c.is_ascii_digit())
+                      .rev()
+                      .collect::<String>()
+                      .parse().unwrap_or(0)
+    }
+}
+#+end_src
+* leetcode - first unique character
+#+begin_src rust
+use std::collections::HashMap;
+#[derive(Eq, PartialEq, Hash)]
+struct Thing {
+    pos: usize,
+    count: u32,
+}
+impl Thing {
+    fn new(pos: usize) -> Self {
+        Thing { pos, count: 0 }
+    }
+    fn increment(&mut self) {
+        self.count += 1;
+    }
+}
+impl Solution {
+    pub fn first_uniq_char(s: String) -> i32 {
+        let mut h: HashMap<char, Thing> = HashMap::new();
+        s.chars()
+            .enumerate()
+            .for_each(|(i, c)| h.entry(c).or_insert(Thing::new(i)).increment());
+        if let Some(t) = h
+            .iter()
+            .filter(|(k, v)| v.count == 1)
+            .min_by_key(|(k, v)| v.pos)
+        {
+            t.1.pos as i32
+        } else {
+            -1
+        }
+    }
+}
+#+end_src
+* leetcode - is anagram
+#+begin_src rust
+impl Solution {
+    pub fn is_anagram(s: String, t: String) -> bool {
+        const alphabet: std::ops::RangeInclusive<char> = 'a'..='z';
+        let f = |s: String| {
+            let mut arr = [0; 26];
+            s.chars().for_each(|c| arr[alphabet.position(|i| c == i).unwrap()] += 1);
+            arr
+        };
+        f(s) == f(t)
+    }
+}
+#+end_src
+* leetcode -  Group Anagrams
+#+begin_src rust
+use std::collections::{HashMap,HashSet};
+
+impl Solution {
+    pub fn group_anagrams(strs: Vec<String>) -> Vec<Vec<String>> {
+        let mut h: HashMap<Vec<char>, Vec<String>> = HashMap::new();
+        for s in strs {
+            let mut v = s.chars().collect::<Vec<char>>();
+            v.sort();
+            let mut e = h.entry(v).or_insert(vec![]);
+            e.push(s);
+        }
+        let mut r = vec![];
+        for v in h.values() {
+            r.push(v.to_owned());
+        }
+        r
     }
 }
 #+end_src
