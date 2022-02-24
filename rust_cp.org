@@ -2206,7 +2206,7 @@ impl Solution {
     }
 }
 #+end_src
-* leetcode -  Group Anagrams
+* leetcode - group anagrams
 #+begin_src rust
 use std::collections::{HashMap,HashSet};
 
@@ -2227,3 +2227,60 @@ impl Solution {
     }
 }
 #+end_src
+* leetcode - set matrix zeroes
+#+begin_src rust
+impl Solution {
+    pub fn set_zeroes(matrix: &mut Vec<Vec<i32>>) {
+        let mut cols = vec![];
+        for row in matrix.iter_mut() {
+            if row.contains(&0) {
+                row.iter()
+                    .enumerate()
+                    .filter(|(i, x)| *x == &0)
+                    .for_each(|(i, _)| cols.push(i));
+                let r = vec![0i32; row.len()];
+                let v = std::mem::replace(row, r);
+            }
+        }
+        for row in matrix {
+            for col in cols.iter() {
+                row[*col] = 0;
+            }
+        }
+    }
+}
+#+end_src
+* leetcode - longest substring without repeating characters
+** non-linear 0(n^2) time complexity
+#+begin_src rust
+impl Solution {
+    pub fn length_of_longest_substring(s: String) -> i32 {
+        let (mut maxlen, mut b) = (0, 0);
+        for (i, c) in s.chars().enumerate() {
+            if let Some(cp) = s[b..i].chars().rev().position(|x| c == x) {
+                b = i - cp;
+            }
+            maxlen = std::cmp::max(maxlen, s[b..=i].len());
+        }
+        maxlen as i32
+    }
+}
+#+end_src
+** linear time complexity
+#+begin_src rust
+impl Solution {
+    pub fn length_of_longest_substring(s: String) -> i32 {
+        let (mut start, mut maxlen, mut map) = (0, 0, [0; 256]);
+        for (end, ch) in s.chars().enumerate() {
+            if let Some(v) = map.get_mut(ch as usize) {
+                start = std::cmp::max(start, *v);
+                *v = end + 1;
+            }
+            maxlen = std::cmp::max(maxlen, end + 1 - start);
+        }
+        maxlen as i32
+    }
+}
+#+end_src
+** other interesting approaches
+- [[https://leetcode.com/explore/interview/card/top-interview-questions-medium/103/array-and-strings/779/discuss/247505/Rust-0ms-beats-100-using-VecDeque-10-lines-of-code][using VecDeque]]
