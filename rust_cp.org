@@ -2548,3 +2548,221 @@ impl Solution {
     }
 }
 #+end_src
+* leetcode - Sum of two integers
+#+begin_quote
+return the sum of the two integers without using the operators + and -
+#+end_quote
+** to string, iterating over bits, adding bit by bit
+#+begin_src rust
+fn main() {}
+struct Solution;
+impl Solution {
+    pub fn get_sum(a: i32, b: i32) -> i32 {
+        let mut result = std::collections::VecDeque::new();
+        let mut carry = false;
+        let a = format!("{:#032b}", a);
+        let b = format!("{:#032b}", b);
+        let a = a.trim_start_matches("0b");
+        let b = b.trim_start_matches("0b");
+        for (aa, bb) in a
+            .chars()
+            .zip(b.chars())
+            .collect::<Vec<(char, char)>>()
+            .iter()
+            .rev()
+        {
+            let v = match (carry, aa.to_digit(10).unwrap(), bb.to_digit(10).unwrap()) {
+                (false, 0, 0) => 0,
+                (false, 1, 1) => {
+                    carry = true;
+                    0
+                }
+                (false, 1, 0) | (false, 0, 1) => 1,
+                (true, 0, 1) | (true, 1, 0) => {
+                    carry = true;
+                    0
+                }
+                (true, 1, 1) => {
+                    carry = true;
+                    1
+                }
+                (true, 0, 0) => {
+                    carry = false;
+                    1
+                }
+                _ => panic!(),
+            };
+            result.push_front(v);
+        }
+        let result = Vec::<i32>::from(result)
+            .iter()
+            .map(|i| i.to_string())
+            .collect::<String>();
+        i32::from_str_radix(&result, 2).unwrap()
+    }
+}
+
+#[test]
+fn test_double() {
+    let x = Solution::get_sum(11, 13);
+    assert_eq!(x, 11 + 13);
+}
+#[test]
+fn test_rouble() {
+    let x = Solution::get_sum(14, 13);
+    assert_eq!(x, 14 + 13);
+}
+#[test]
+fn test_roubie() {
+    let x = Solution::get_sum(1, 1);
+    assert_eq!(x, 2);
+}
+#+end_src
+**
+#+begin_src rust
+fn bitwise_add(mut a: i32, mut b: i32) -> i32 {
+    while b != 0 {
+        let carry = a & b;  // carry value is calculated
+        println!("a:{:#08b}\nb:{:#08b}\nc:{:#08b}\n---", a,b,carry);
+        a = a ^ b;      // sum value is calculated and stored in a
+        b = carry << 1; // the carry value is shifted towards left by a bit
+        println!("a:{:#08b}\nb:{:#08b}\nc:{:#08b}\n", a,b,carry);
+    }
+    a
+}
+
+fn main() {
+    // bitwise_add(11,13);
+    bitwise_add(2,1);
+}
+#+end_src
+
+#+RESULTS:
+: a:0b000010
+: b:0b000001
+: c:0b000000
+: ---
+: a:0b000011
+: b:0b000000
+: c:0b000000
+:
+
+* leetcode - add two numbers
+** iterative
+#+begin_src rust
+// Definition for singly-linked list.
+// #[derive(PartialEq, Eq, Clone, Debug)]
+// pub struct ListNode {
+//   pub val: i32,
+//   pub next: Option<Box<ListNode>>
+// }
+//
+// impl ListNode {
+//   #[inline]
+//   fn new(val: i32) -> Self {
+//     ListNode {
+//       next: None,
+//       val
+//     }
+//   }
+// }
+impl ListNode {
+    fn push(self, elem: i32) -> Self {
+        let mut new_node = Self::new(elem);
+        new_node.next = Some(Box::new(self));
+        new_node
+    }
+    fn extract_vals(mut ll: Option<Box<ListNode>>) -> Vec<i32> {
+        let mut v = vec![];
+        while let Some(x) = ll {
+            v.push(x.val);
+            ll = x.next;
+        }
+        v
+    }
+}
+impl Solution {
+    fn extract_vals(mut ll: Option<Box<ListNode>>) -> Vec<i32> {
+        let mut v = vec![];
+        while let Some(x) = ll {
+            v.push(x.val);
+            ll = x.next;
+        }
+        v
+    }
+    fn get_sum(mut v1: Vec<i32>, mut v2: Vec<i32>) -> std::collections::VecDeque<i32> {
+        let mut carry = 0;
+        let mut r = std::collections::VecDeque::with_capacity(100);
+        let lendiff = v1.len() as isize - v2.len() as isize;
+        if lendiff > 0 {
+            v2.extend(vec![0; lendiff as usize]);
+        } else {
+            v1.extend(vec![0; lendiff.abs() as usize]);
+        }
+        for (a,b) in v1.iter().zip(v2.iter()) {
+            let x = a + b + carry;
+            r.push_front(if x >= 10 {
+                carry = 1;
+                x.rem_euclid(10)
+            } else {
+                carry = 0;
+                x
+            });
+        }
+        if carry == 1 {
+            r.push_front(1);
+        }
+        r
+    }
+    pub fn add_two_numbers(mut l1: Option<Box<ListNode>>,  mut l2: Option<Box<ListNode>>) -> Option<Box<ListNode>> {
+        let n1 = ListNode::extract_vals(l1);
+        let n2 = ListNode::extract_vals(l2);
+        let mut digits = Self::get_sum(n1, n2);
+        let init = digits.pop_front().unwrap();
+        let mut node = ListNode::new(init);
+        for d in digits {
+            node = node.push(d);
+        }
+        Some(Box::new(node))
+    }
+}
+#+end_src
+** recursive (faster)
+#+begin_src rust
+impl Solution {
+    pub fn add_two_numbers(l1: Option<Box<ListNode>>, l2: Option<Box<ListNode>>) -> Option<Box<ListNode>> {
+        match (l1, l2) {
+            (None, None) => None,
+            (Some(n), None) | (None, Some(n)) => Some(n),
+            (Some(n1), Some(n2)) => {
+                let sum = n1.val + n2.val;
+                if sum < 10 {
+                    Some(Box::new(ListNode {
+                        val: sum,
+                        next: Solution::add_two_numbers(n1.next, n2.next)
+                    }))
+                } else {
+                    let carry = Some(Box::new(ListNode::new(1)));
+                    Some(Box::new(ListNode {
+                        val: sum - 10,
+                        next: Solution::add_two_numbers(Solution::add_two_numbers(carry, n1.next), n2.next)
+                    }))
+                }
+            }
+        }
+    }
+}
+#+end_src
+* leetcode - two sum
+#+begin_src rust
+impl Solution {
+    pub fn two_sum(mut nums: Vec<i32>, target: i32) -> Vec<i32> {
+        while let Some(v) = nums.pop() {
+            for (idx, _) in nums.iter().enumerate().filter(|(_, n)| v + **n == target) {
+                return vec![idx as i32, nums.len() as i32];
+            }
+        }
+        return vec![];
+    }
+}
+#+end_src
