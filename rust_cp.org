@@ -2787,3 +2787,12 @@ impl Solution {
     }
 }
 #+end_src
+* leetcode - binary search
+#+begin_src rust
+impl Solution {
+    pub fn search(nums: Vec<i32>, target: i32) -> i32 {
+        nums.binary_search(&target)
+            .map_or_else(|i| -1 as i32, |i| i as i32)
+    }
+}
+#+end_src
