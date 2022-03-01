@@ -2766,3 +2766,24 @@ impl Solution {
     }
 }
 #+end_src
+** other interesting approaches
+- [[https://leetcode.com/problems/two-sum/discuss/1563252/Functional-Rust][hashmap.and_then]]
+- [[https://leetcode.com/problems/two-sum/discuss/1067029/Fast-(somewhat)-idiomatic-rust-solution-using-moving-pointers.-0ms-2mb][sort then peek from both ends]]
+* leetcode - Two Sum II - Input Array Is Sorted
+#+begin_src rust
+impl Solution {
+    pub fn two_sum(numbers: Vec<i32>, target: i32) -> Vec<i32> {
+        let mut start = numbers.iter().enumerate().peekable();
+        let mut end = numbers.iter().enumerate().rev().peekable();
+
+        while let (Some(s), Some(e)) = (start.peek(), end.peek()) {
+            match (*s.1 + *e.1).cmp(&target) {
+                std::cmp::Ordering::Less => start.next(),
+                std::cmp::Ordering::Equal => return vec![1+s.0 as i32, 1+e.0 as i32],
+                std::cmp::Ordering::Greater => end.next(),
+            };
+        }
+        vec![]
+    }
+}
+#+end_src
