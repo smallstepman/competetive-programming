@@ -2796,3 +2796,70 @@ impl Solution {
     }
 }
 #+end_src
+* interview - max of increasing then decreasing array
+#+begin_src rust
+fn take_max(mut a: &[u32]) -> u32 {
+    loop {
+        if a.len() < 3 {
+            return *a.iter().max().unwrap()
+        }
+        let i = a.len() / 2;
+        let x = a.get(i-1).unwrap();
+        let y = a.get(i).unwrap();
+        if x > y {
+            a = &a[..i];
+        } else {
+            a = &a[i..];
+        }
+    }
+}
+
+fn take_max_r(mut a: &[u32]) -> u32 {
+    if a.len() < 3 {
+        return *a.iter().max().unwrap()
+    }
+    let i = a.len() / 2;
+    let x = a.get(i-1).unwrap();
+    let y = a.get(i).unwrap();
+    if x > y {
+        take_max_r(&a[..i])
+    } else {
+        take_max_r(&a[i..])
+    }
+}
+
+fn main() {
+    let i = [1,2,3,4,3,2];
+    let o = 4;
+    assert_eq!(take_max(&i),o);
+    let i = [1,2,3,4];
+    let o = 4;
+    assert_eq!(take_max(&i),o);
+    let i = [4,3,2,1];
+    let o = 4;
+    assert_eq!(take_max(&i),o);
+    let i = [1];
+    let o = 1;
+    assert_eq!(take_max(&i),o);
+    // let i = [];
+    // let o = None;
+    // assert_eq!(take_max(&i),o);
+    let i = [1,2,3,4,3,2];
+    let o = 4;
+    assert_eq!(take_max_r(&i),o);
+    let i = [1,2,3,4];
+    let o = 4;
+    assert_eq!(take_max_r(&i),o);
+    let i = [4,3,2,1];
+    let o = 4;
+    assert_eq!(take_max_r(&i),o);
+    let i = [1];
+    let o = 1;
+    assert_eq!(take_max_r(&i),o);
+    // let i = [];
+    // let o = None;
+    // assert_eq!(take_max_r(&i),o);
+}
+#+end_src
+
+#+RESULTS:
